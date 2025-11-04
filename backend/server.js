@@ -5,6 +5,7 @@ import cors from "cors";
 import path from "path";
 import { fileURLToPath } from "url";
 
+// Routers
 import memberRoutes from "./routes/memberRoutes.js";
 import familyRoutes from "./routes/familyRoutes.js";
 import marriageRoutes from "./routes/marriageRoutes.js";
@@ -14,18 +15,23 @@ import subscriptionRoutes from "./routes/subscriptionRoutes.js";
 
 dotenv.config();
 const app = express();
+
+// Middleware
 app.use(cors());
 app.use(express.json());
 
-// MongoDB connection
+// -------------------
+// MongoDB Connection
+// -------------------
 mongoose
-  .connect(process.env.MONGO_URI, {
-    dbName: "churchDB",
-  })
+  .connect(process.env.MONGO_URI, { dbName: "churchDB" })
   .then(() => console.log("✅ MongoDB connected successfully"))
   .catch((err) => console.error("❌ MongoDB connection error:", err));
 
-// Routes
+// -------------------
+// API Routes
+// -------------------
+// Always use relative paths starting with "/"
 app.use("/api/members", memberRoutes);
 app.use("/api/families", familyRoutes);
 app.use("/api/marriages", marriageRoutes);
@@ -33,20 +39,16 @@ app.use("/api/baptisms", baptismRoutes);
 app.use("/api/deaths", deathRoutes);
 app.use("/api/subscriptions", subscriptionRoutes);
 
-// Root API endpoint
-app.get("/", (req, res) => {
-  res.send("✅ ChurchDB API is running");
-});
-
 // Test endpoints
+app.get("/", (req, res) => res.send("✅ ChurchDB API is running"));
+
 app.get("/api/test-db", async (req, res) => {
   try {
     const db = mongoose.connection.db;
     const collections = await db.listCollections().toArray();
     const counts = {};
     for (const col of collections) {
-      const count = await db.collection(col.name).countDocuments();
-      counts[col.name] = count;
+      counts[col.name] = await db.collection(col.name).countDocuments();
     }
     res.json({
       connected: mongoose.connection.readyState === 1,
@@ -55,45 +57,29 @@ app.get("/api/test-db", async (req, res) => {
       documentCounts: counts,
     });
   } catch (err) {
-    res.status(500).json({ error: err.message, stack: err.stack });
-  }
-});
-
-app.get("/api/test-subscriptions", async (req, res) => {
-  try {
-    const Subscription = mongoose.model("Subscription");
-    const count = await Subscription.countDocuments();
-    const all = await Subscription.find().limit(5);
-    res.json({
-      count,
-      collectionName: Subscription.collection.name,
-      sample: all,
-    });
-  } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
 // -------------------
-// Serve React frontend
+// Serve React Frontend
 // -------------------
-
-// Needed because we are using ES modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+const reactBuildPath = path.join(__dirname, "../tnp-proj/build");
 
-// Serve static files from React build
-app.use(express.static(path.join(__dirname, "../tnp-proj/build")));
+// Serve React static files
+app.use(express.static(reactBuildPath));
 
-// Serve React for any route not handled by API
+// Fallback for any frontend route
 app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "../tnp-proj/build", "index.html"));
+  res.sendFile(path.join(reactBuildPath, "index.html"));
 });
 
 // -------------------
-
+// Start Server
+// -------------------
 const PORT = process.env.PORT || 8080;
-console.log("Starting server...");
 app.listen(PORT, "0.0.0.0", () =>
-  console.log(`🚀 Server running on http://localhost:${PORT}`)
+  console.log(`🚀 Server running on port ${PORT}`)
 );

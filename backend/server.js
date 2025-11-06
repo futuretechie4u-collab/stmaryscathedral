@@ -84,9 +84,11 @@ app.get("/api/test-subscriptions", async (req, res) => {
 app.use(express.static(path.join(__dirname, "../tnp-proj/build")));
 
 // Serve React for any route not handled by API
-app.get("*", (req, res) => {
+// Serve React fallback for any unknown route
+app.use((req, res) => {
   res.sendFile(path.join(__dirname, "../tnp-proj/build", "index.html"));
 });
+
 // -------------------
 
 const PORT = process.env.PORT || 8080;

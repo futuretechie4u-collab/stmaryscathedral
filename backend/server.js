@@ -17,6 +17,10 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// Needed because we are using ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 // MongoDB connection
 mongoose
   .connect(process.env.MONGO_URI, {
@@ -77,19 +81,12 @@ app.get("/api/test-subscriptions", async (req, res) => {
 // -------------------
 // Serve React frontend
 // -------------------
-
-// Needed because we are using ES modules
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-// Serve static files from React build
 app.use(express.static(path.join(__dirname, "../tnp-proj/build")));
 
 // Serve React for any route not handled by API
 app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "../tnp-proj/build", "index.html"));
 });
-
 // -------------------
 
 const PORT = process.env.PORT || 8080;

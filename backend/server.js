@@ -21,8 +21,6 @@ app.use(express.json());
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Serve React build
-app.use(express.static(path.join(__dirname, "../tnp-proj/build")));
 // MongoDB connection
 mongoose
   .connect(process.env.MONGO_URI, {
@@ -82,6 +80,8 @@ app.get("/api/test-subscriptions", async (req, res) => {
 
 // -------------------
 
+// Serve React build
+app.use(express.static(path.join(__dirname, "../tnp-proj/build")));
 // Serve React for any route not handled by API
 app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "../tnp-proj/build/index.html"));

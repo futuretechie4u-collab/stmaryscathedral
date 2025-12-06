@@ -37,9 +37,10 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/About" element={<About />} />
             <Route path="/FamilyDetails" element={<FamilyDetails />} />
-<Route path="/family/:familyId" element={<FamilyDetails />} />
+              <Route path="/FamilyDetails/:familyId" element={<FamilyDetails />} />
 
             <Route path="/AddFamily" element={<AddFamily />} />
+            <Route path="/MemberDetails" element={<MemberDetails />} />
             <Route path="/MemberDetails/:memberId" element={<MemberDetails />} />
             <Route path="/AddMember" element={<AddMember />} />
             <Route path="/ExistingFamilymem" element={<ExistingFamilymem />} />

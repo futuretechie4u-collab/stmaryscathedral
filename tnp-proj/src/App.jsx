@@ -36,7 +36,7 @@ function App() {
           <Routes> 
             <Route path="/" element={<Home />} />
             <Route path="/About" element={<About />} />
-            <Route path="/family" element={<FamilyDetails />} />
+            <Route path="/FamilyDetails" element={<FamilyDetails />} />
 <Route path="/family/:familyId" element={<FamilyDetails />} />
 
             <Route path="/AddFamily" element={<AddFamily />} />

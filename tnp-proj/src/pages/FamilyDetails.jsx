@@ -9,7 +9,7 @@ const FamilyDetails = () => {
   return (
     <div className="card-container1">
 
-      <h2>Family ID: {familyId}</h2>
+      <h2>Family ID: {familyId || "None"}</h2>
 
       <div className="card" onClick={() => navigate("/add-family")}>
         <div className="card-details">
@@ -17,9 +17,16 @@ const FamilyDetails = () => {
         </div>
       </div>
 
-      <div className="card" onClick={() => navigate("/SearchFamily")}>
+      <div className="card" onClick={() => navigate("/search-family")}>
         <div className="card-details">
           <p className="text-title">SEARCH FAMILY</p>
+        </div>
+      </div>
+
+      {/* Example: navigate to a specific family */}
+      <div className="card" onClick={() => navigate("/family/1")}>
+        <div className="card-details">
+          <p className="text-title">VIEW FAMILY 1</p>
         </div>
       </div>
 

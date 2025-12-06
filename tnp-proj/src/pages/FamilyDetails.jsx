@@ -17,7 +17,7 @@ const FamilyDetails = () => {
         </div>
       </div>
 
-      <div className="card" onClick={() => navigate("/search-family")}>
+      <div className="card" onClick={() => navigate("/SearchFamily")}>
         <div className="card-details">
           <p className="text-title">SEARCH FAMILY</p>
         </div>

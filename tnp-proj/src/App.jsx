@@ -44,10 +44,12 @@ function App() {
             <Route path="/AddMember" element={<AddMember />} />
             <Route path="/ExistingFamilymem" element={<ExistingFamilymem />} />
             <Route path="/ViewMembers" element={<ViewMembers />} />
+            <Route path="/EditMember" element={<EditMember />} />
             <Route path="/EditMember/:memberId" element={<EditMember />} />
             <Route path="/Marriage" element={<Marriage />} />
               <Route path="/Marriage/:marriageId" element={<Marriage />} />
             <Route path="/AddMarriage" element={<AddMarriage />} />
+            <Route path="/ViewMarriage" element={<EditMember />} />
             <Route path="/ViewMarriage/:marriageId" element={<ViewMarriage />} />
             <Route path="/SignIn" element={<SignIn />} />
             <Route path="/SearchFamily" element={<SearchFamily />} />

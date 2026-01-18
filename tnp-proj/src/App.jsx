@@ -50,7 +50,7 @@ function App() {
             <Route path="/Marriage" element={<Marriage />} />
               <Route path="/Marriage/:marriageId" element={<Marriage />} />
             <Route path="/AddMarriage" element={<AddMarriage />} />
-            <Route path="/ViewMarriage" element={<EditMember />} />
+            <Route path="/ViewMarriage" element={<ViewMarriage />} />
             <Route path="/ViewMarriage/:marriageId" element={<ViewMarriage />} />
             <Route path="/SignIn" element={<SignIn />} />
             <Route path="/SearchFamily" element={<SearchFamily />} />

@@ -1,0 +1,86 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #f4f1ee;
+}
+
+.navbar {
+  width: 100vw;
+  height: 100px;
+  background-color: #e7d8c9; /* Warm Tan */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 1rem;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 999;
+  border-bottom: 2px solid #8b5e3c; /* Rich earthy brown */
+}
+
+.navbar-left {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+
+.logo-wrapper {
+  margin-left: 40px;
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #fff8f0;
+  transition: box-shadow 0.2s ease;
+  box-shadow: 0 0 10px rgba(139, 94, 60, 0.1); /* subtle brown glow */
+}
+
+.logo-wrapper:hover {
+  box-shadow: 0 0 25px 5px rgba(139, 94, 60, 0.35); /* warm brown glow */
+}
+
+.logo {
+  width: 65px;
+  height: 65px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.site-title {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #3e2c23; /* Deep brown */
+  max-width: 400px;
+  line-height: 1.2;
+  cursor: pointer;
+}
+
+.navbar-right {
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.navbar-right span {
+  font-size: 18px;
+  color: #4f6f52; /* Forest Green */
+  font-weight: 600;
+  cursor: pointer;
+  margin-right: 50px;
+  transition: color 0.3s ease;
+}
+
+.navbar-right span:hover {
+  color: #3e2c23;
+}

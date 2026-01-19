@@ -1,0 +1,148 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+body {
+  background: #f9f4ec; /* light cream */
+  color: #2f2f2f;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+}
+
+/* Form Title */
+.register-form h2 {
+  font-size: 24px;
+  color: #a68160; /* earthy orange-brown */
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Decorative Dot */
+.dot {
+  width: 10px;
+  height: 10px;
+  background: #a68160;
+  border-radius: 50%;
+}
+
+/* Description Text */
+.register-form p {
+  margin: 10px 0 20px;
+  font-size: 14px;
+  color: #7d7369;
+}
+
+/* First and Last Name Fields */
+.name-rows {
+  display: flex;
+  gap: 30px;
+}
+
+/* Input Group */
+.input-group {
+  position: relative;
+  margin-bottom: 20px;
+  flex: 1;
+}
+
+/* Input Fields */
+.input-group input {
+  width: 100%;
+  padding: 14px 10px;
+  background: #f2e9db;
+  border: 1px solid #c8b6a6;
+  border-radius: 8px;
+  color: #3d3d3d;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.3s ease;
+}
+
+.input-group input:focus {
+  border-color: #a68160;
+}
+
+/* Floating Labels */
+.input-group label {
+  position: absolute;
+  top: 50%;
+  left: 10px;
+  transform: translateY(-50%);
+  color: #6e665c;
+  font-size: 14px;
+  pointer-events: none;
+  transition: 0.3s ease;
+  background: #f2e9db;
+  padding: 0 4px;
+}
+
+.input-group input:focus + label,
+.input-group input:not(:placeholder-shown):valid + label {
+  top: -8px;
+  font-size: 12px;
+  color: #5d4f44;
+}
+
+/* Submit Button */
+.submit-btn {
+  width: 100%;
+  background: #a68160;
+  border: none;
+  padding: 14px;
+  border-radius: 10px;
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.submit-btn:hover {
+  background: #8e5c3c;
+}
+
+/* Sign-in Text */
+.signin-text {
+  text-align: center;
+  margin-top: 15px;
+  font-size: 14px;
+  color: #7d7369;
+}
+
+.signin-text a {
+  color: #a68160;
+  text-decoration: none;
+}
+
+/* Popup Overlay (background dimmer) */
+.popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(97, 78, 59, 0.4); /* warm shadow */
+  z-index: 9998;
+}
+
+/* Popup Modal Box */
+.popup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 9999;
+  background-color: #fff8ef; /* soft cream */
+  padding: 30px;
+  border-radius: 20px;
+  width: 1550px;
+  max-width: 90vw;
+  box-shadow: 0 0 20px rgba(150, 129, 105, 0.3);
+  color: #2f2f2f;
+}

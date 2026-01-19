@@ -1,0 +1,383 @@
+body {
+  background-color: #f4f1ee;
+  color: #3e2c23;
+  font-family: 'Segoe UI', sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+.marriage-flex-container {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  flex-wrap: wrap;
+  padding: 2rem;
+}
+
+.marriage-card {
+  width: 45%;
+  min-width: 350px;
+  background-color: #fff8f0;
+  border-radius: 10px;
+  box-shadow: 0 0 12px rgba(139, 94, 60, 0.2);
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #d9c4b0;
+}
+
+.marriage-title {
+  margin-bottom: 1rem;
+  text-align: center;
+  font-size: 1.3rem;
+  color: #4f3a2d;
+  font-weight: 600;
+}
+
+.marriage-input-wrapper {
+  display: flex;
+  align-items: center;
+  border: 1px solid #cbb89d;
+  border-radius: 8px;
+  padding: 0.5rem;
+  background-color: #f0e2d0;
+  margin-bottom: 1rem;
+  position: relative;
+}
+
+.marriage-input {
+  border: none;
+  outline: none;
+  background: transparent;
+  flex-grow: 1;
+  font-size: 1rem;
+  color: #3e2c23;
+  padding: 0.5rem;
+  width: 100%;
+}
+
+.marriage-input::placeholder {
+  color: #8b6f47;
+  opacity: 0.6;
+}
+
+.marriage-input-wrapper svg {
+  flex-shrink: 0;
+  margin-left: 0.5rem;
+}
+
+.marriage-selected-info {
+  background: #e8f5e9;
+  border: 2px solid #4caf50;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.marriage-selected-info strong {
+  color: #2e7d32;
+  font-size: 14px;
+}
+
+.marriage-clear-btn {
+  background: #8b5a3c;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: background 0.3s;
+}
+
+.marriage-clear-btn:hover {
+  background: #6d4530;
+}
+
+.marriage-table-container {
+  max-height: 300px;
+  overflow: auto;
+  border-radius: 6px;
+  border: 1px solid #e7d8c9;
+  background-color: #fffefb;
+}
+
+.marriage-table {
+  width: 100%;
+  min-width: 600px;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+.marriage-table th,
+.marriage-table td {
+  padding: 0.6rem;
+  border: 1px solid #e2d2be;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.marriage-table th {
+  background-color: #f0e2d0;
+  color: #3e2c23;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  font-weight: 600;
+}
+
+.marriage-table tbody tr:hover {
+  background-color: #fef8f0;
+}
+
+.marriage-no-data {
+  text-align: center;
+  color: #8b6f47;
+  font-style: italic;
+  padding: 30px !important;
+  white-space: normal;
+}
+
+.marriage-select-btn {
+  background: #8b5a3c;
+  color: white;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  transition: background 0.3s;
+}
+
+.marriage-select-btn:hover {
+  background: #6d4530;
+}
+
+.marriage-select-btn:active {
+  transform: scale(0.98);
+}
+
+/* Marriage Form Container */
+.marriage-form-container {
+  max-width: 900px;
+  margin: 30px auto;
+  background-color: #fff8f0;
+  border-radius: 10px;
+  box-shadow: 0 0 12px rgba(139, 94, 60, 0.2);
+  padding: 2rem;
+  border: 1px solid #d9c4b0;
+}
+
+.marriage-form-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #4f3a2d;
+  margin-bottom: 25px;
+  text-align: center;
+  border-bottom: 3px solid #8b5a3c;
+  padding-bottom: 15px;
+}
+
+.marriage-form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+  margin-bottom: 25px;
+}
+
+.marriage-input-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.marriage-input-group label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #4f3a2d;
+  margin-bottom: 8px;
+}
+
+.marriage-input-group input,
+.marriage-input-group select,
+.marriage-input-group textarea {
+  padding: 12px;
+  border: 1px solid #cbb89d;
+  border-radius: 8px;
+  font-size: 14px;
+  background-color: #fffefb;
+  color: #3e2c23;
+  transition: border-color 0.3s;
+}
+
+.marriage-input-group input:focus,
+.marriage-input-group select:focus,
+.marriage-input-group textarea:focus {
+  outline: none;
+  border-color: #8b5a3c;
+  background-color: #fff;
+}
+
+.marriage-input-group textarea {
+  min-height: 80px;
+  resize: vertical;
+}
+
+/* Marriage Summary */
+.marriage-summary {
+  background: #f0e2d0;
+  border-left: 4px solid #8b5a3c;
+  padding: 20px;
+  margin-bottom: 25px;
+  border-radius: 8px;
+}
+
+.marriage-summary h3 {
+  font-size: 18px;
+  color: #4f3a2d;
+  margin-bottom: 12px;
+  font-weight: 600;
+}
+
+.marriage-couple-info {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+}
+
+.marriage-couple-info div {
+  font-size: 14px;
+  color: #3e2c23;
+  background: #fffefb;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #e2d2be;
+}
+
+.marriage-couple-info strong {
+  color: #4f3a2d;
+  display: block;
+  margin-bottom: 5px;
+  font-weight: 600;
+}
+
+/* Submit Button */
+.marriage-submit-btn {
+  width: 100%;
+  background: linear-gradient(135deg, #8b5a3c 0%, #6d4530 100%);
+  color: white;
+  border: none;
+  padding: 15px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.3s;
+  box-shadow: 0 4px 15px rgba(139, 90, 60, 0.3);
+}
+
+.marriage-submit-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(139, 90, 60, 0.4);
+}
+
+.marriage-submit-btn:active {
+  transform: translateY(0);
+}
+
+.marriage-submit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Scrollbar Styling */
+.marriage-table-container::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.marriage-table-container::-webkit-scrollbar-track {
+  background: #f0e2d0;
+  border-radius: 4px;
+}
+
+.marriage-table-container::-webkit-scrollbar-thumb {
+  background: #cbb89d;
+  border-radius: 4px;
+}
+
+.marriage-table-container::-webkit-scrollbar-thumb:hover {
+  background: #8b6f47;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .marriage-flex-container {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .marriage-card {
+    width: 90%;
+    max-width: 600px;
+  }
+
+  .marriage-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .marriage-couple-info {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .marriage-flex-container {
+    padding: 1rem;
+  }
+
+  .marriage-card {
+    width: 100%;
+    min-width: unset;
+    padding: 1rem;
+  }
+
+  .marriage-table {
+    font-size: 0.85rem;
+    min-width: 500px;
+  }
+
+  .marriage-table th,
+  .marriage-table td {
+    padding: 0.4rem;
+  }
+
+  .marriage-form-container {
+    margin: 20px 1rem;
+    padding: 1.5rem;
+  }
+
+  .marriage-title {
+    font-size: 1.1rem;
+  }
+
+  .marriage-form-title {
+    font-size: 1.3rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .marriage-table {
+    min-width: 450px;
+    font-size: 0.8rem;
+  }
+
+  .marriage-select-btn {
+    padding: 4px 10px;
+    font-size: 11px;
+  }
+}

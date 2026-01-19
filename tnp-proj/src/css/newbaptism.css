@@ -1,0 +1,101 @@
+/* General reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+body {
+  background: #f9f6f1; /* light cream */
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+}
+
+/* Container */
+.container {
+  background: #fffef9; /* soft off-white cream */
+  padding: 30px;
+  border-radius: 20px;
+  width: 100%;
+  max-width: 500px;
+  color: #4e463c; /* dark soft brown */
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Heading */
+h2 {
+  text-align: center;
+  margin-bottom: 25px;
+  color: #5c5145;
+  font-size: 22px;
+}
+
+/* Input groups */
+.input-group {
+  position: relative;
+  margin-bottom: 20px;
+}
+
+.input-group input,
+.input-group textarea {
+  width: 100%;
+  padding: 14px 10px;
+  background: #f3eee7; /* light warm beige */
+  border: 1px solid #d6cfc4;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #4e463c;
+  outline: none;
+  resize: none;
+}
+
+/* Label floating inside input */
+.input-group label {
+  position: absolute;
+  top: 50%;
+  left: 12px;
+  transform: translateY(-50%);
+  color: #8e8170;
+  font-size: 14px;
+  background: #f3eee7;
+  padding: 0 4px;
+  pointer-events: none;
+  transition: 0.3s ease;
+}
+
+.input-group input:focus + label,
+.input-group input:valid + label,
+.input-group textarea:focus + label,
+.input-group textarea:valid + label {
+  top: -10px;
+  left: 10px;
+  font-size: 12px;
+  color: #6e6257;
+}
+
+/* Submit button */
+.submit-btn {
+  width: 100%;
+  background: #d8b98a; /* creamy tan */
+  border: none;
+  padding: 14px;
+  border-radius: 10px;
+  color: #fffef9;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.submit-btn:hover {
+  background: #cba76f;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .container {
+    padding: 20px;
+  }
+}

@@ -1,0 +1,100 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+body {
+  background: #f9f6f1; /* light cream background */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 20px;
+}
+
+.container {
+  background: #fffef9; /* soft off-white cream */
+  padding: 30px;
+  border-radius: 20px;
+  width: 100%;
+  max-width: 650px;
+  color: #4e463c; /* soft dark brown */
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+h2 {
+  text-align: center;
+  margin-bottom: 25px;
+  color: #5c5145;
+  font-size: 22px;
+  font-weight: bold;
+}
+
+/* Two-column layout for form rows */
+.form-row {
+  display: grid;
+  grid-template-columns: 200px 1fr; /* Label | Input */
+  align-items: center;
+  margin-bottom: 18px;
+  gap: 14px;
+}
+
+.form-row label {
+  text-align: right;
+  color: #6e6257; /* medium brown */
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.form-row input,
+.form-row select {
+  width: 100%;
+  padding: 12px 10px;
+  background: #f3eee7; /* light warm beige */
+  border: 1px solid #d6cfc4;
+  border-radius: 8px;
+  color: #4e463c;
+  font-size: 14px;
+  outline: none;
+  appearance: none;
+  transition: 0.3s ease;
+}
+
+.form-row input:focus,
+.form-row select:focus {
+  border-color: #a17c4c; /* brown accent */
+  background: #fff;
+  box-shadow: 0 0 6px rgba(161, 124, 76, 0.4);
+}
+
+/* Buttons */
+button {
+  width: 100%;
+  background: #d8b98a; /* creamy tan */
+  border: none;
+  padding: 14px;
+  border-radius: 10px;
+  color: #fffef9;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+button:hover {
+  background: #cba76f; /* slightly deeper cream tan */
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .form-row {
+    grid-template-columns: 1fr; /* Stack vertically on small screens */
+    text-align: left;
+  }
+
+  .form-row label {
+    text-align: left;
+  }
+}

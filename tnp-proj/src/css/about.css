@@ -1,0 +1,104 @@
+.about-body {
+  padding-top: 2rem;
+  font-weight: 700;
+  background-color: #f4f1ee; /* Earthy Sand */
+  color: #3e2c23; /* Deep Brown */
+  font-family: 'Segoe UI', sans-serif;
+  font-size: 20px;
+  margin: 0;
+  padding: 0;
+}
+
+.about-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  padding: 3rem;
+  background-color: #f4f1ee;
+  gap: 2rem;
+  min-height: 100vh;
+}
+
+.about-text {
+  flex: 1 1 50%;
+  max-width: 600px;
+}
+
+.about-text h2 {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  color: #4f6f52; /* Forest Green */
+}
+
+.about-text p {
+  font-size: 1.25rem;
+  color: #3e2c23;
+  line-height: 1.8;
+  margin-bottom: 1rem;
+}
+
+.about-image {
+  flex: 1 1 40%;
+  max-width: 500px;
+}
+
+.about-image img {
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Responsive Design for Mobile */
+@media (max-width: 768px) {
+  .about-container {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 2rem 1rem;
+  }
+
+  .about-text, .about-image {
+    flex: 1 1 100%;
+    max-width: 100%;
+  }
+
+  .about-text p {
+    font-size: 1.2rem;
+    line-height: 1.8;
+  }
+
+  .about-text h2 {
+    font-size: 1.8rem;
+  }
+  /* --- Add these styles for the ward table --- */
+
+.ward-table {
+  width: 100%;
+  border-collapse: collapse; /* Gives it clean lines */
+  margin-top: 20px;
+  font-size: 0.95rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.ward-table th,
+.ward-table td {
+  border: 1px solid #ddd;
+  padding: 10px 12px;
+  text-align: left;
+}
+
+.ward-table th {
+  background-color: #f4f4f4; /* Light gray header */
+  font-weight: bold;
+  color: #333;
+}
+
+.ward-table tbody tr:nth-child(even) {
+  background-color: #f9f9f9; /* Adds zebra striping for readability */
+}
+
+.ward-table tbody tr:hover {
+  background-color: #f1f1f1; /* Highlight on hover */
+}
+}

@@ -1,0 +1,85 @@
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #f4f1ee;
+  font-family: 'Segoe UI', sans-serif;
+  color: #3e2c23;
+}
+
+.container-input3 {
+  position: relative;
+  padding-left: 60px;
+  padding-bottom: 40px;
+}
+
+.input {
+  width: 300px;
+  padding: 12px 20px;
+  border-radius: 20px;
+  border: 1px solid #8b5e3c;
+  background-color: #fffefb;
+  color: #3e2c23;
+  font-size: 16px;
+  outline: none;
+}
+
+.table-wrapper {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  padding: 2rem;
+  flex-wrap: wrap;
+}
+
+.member-box {
+  background-color: #fffaf0 !important; /* Soft cream */
+  border-radius: 10px;
+  padding: 1rem;
+  width: 48.5%;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  color: #3e2c23;
+}
+
+
+.member-title {
+  text-align: center;
+  margin-bottom: 1rem;
+  font-size: 1.4rem;
+  color: #4f3d2b;
+}
+
+.table-scroll {
+  max-height: 250px;
+  overflow: auto;
+  border-radius: 6px;
+}
+
+/* ✅ Cream Table Styling */
+.member-table {
+  width: 100%;
+  min-width: 600px;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+  color: #3e2c23;
+  background-color: #fffefb;
+}
+
+.member-table th,
+.member-table td {
+  border: 1px solid #e2d2be;
+  padding: 10px;
+  text-align: left;
+  white-space: nowrap;
+  background-color: #fffefb; /* Force light background */
+  color: #3e2c23;
+}
+
+.member-table th {
+  background-color: #f0e2d0;
+  color: #3e2c23;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}

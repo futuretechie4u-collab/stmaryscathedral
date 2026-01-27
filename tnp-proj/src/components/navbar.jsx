@@ -1,9 +1,29 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import '../css/navbar.css';
 import pic1 from '../assets/images/logo.jpg'; 
-import { useNavigate } from 'react-router-dom';  
+import { useNavigate, useLocation } from 'react-router-dom';  
 const Navbar = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const [username, setUsername] = useState('');
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    const checkAuth = () => {
+      const auth = localStorage.getItem('isAuthenticated');
+      const user = localStorage.getItem('username');
+      setIsAuthenticated(!!auth);
+      setUsername(user || 'User');
+    };
+
+    checkAuth();
+  }, [location]);
+
+  const handleSignOut = () => {
+    localStorage.removeItem('isAuthenticated');
+    localStorage.removeItem('username');
+    navigate('/SignIn');
+  };
 
   return (
     <nav className="navbar">
@@ -18,7 +38,14 @@ const Navbar = () => {
       <div className="navbar-right">
         <span onClick={() => navigate('/')} className="nav-link">Home</span>
         <span onClick={() => navigate('/About')} className="nav-link">About</span>
-        <span onClick={() => navigate('/SignIn')} className="nav-link">Sign In</span>
+        {isAuthenticated ? (
+          <>
+            <span className="nav-link" style={{cursor: 'default'}}>{username}</span>
+            <span onClick={handleSignOut} className="nav-link">Sign Out</span>
+          </>
+        ) : (
+          <span onClick={() => navigate('/SignIn')} className="nav-link">Sign In</span>
+        )}
       </div>
     </nav>
   );

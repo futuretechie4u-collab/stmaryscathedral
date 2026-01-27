@@ -1,7 +1,7 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useNavigate } from "react-router-dom";
 import './App.css'
 import Navbar from './components/navbar'
 import About from './About';
@@ -29,12 +29,22 @@ import EditMember from './pages/memberdetails/EditMember';
 
 
 function App() {
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    const isAuthenticated = localStorage.getItem('isAuthenticated')
+    if (!isAuthenticated) {
+      navigate('/SignIn')
+    }
+  }, [navigate])
+
   return (
     <>
       <Navbar />
      
       <div style={{ paddingTop: '120px' }}>
           <Routes> 
+            <Route path="/SignIn" element={<SignIn />} />
             <Route path="/" element={<Home />} />
             <Route path="/About" element={<About />} />
             <Route path="/FamilyDetails" element={<FamilyDetails />} />
@@ -52,7 +62,7 @@ function App() {
             <Route path="/AddMarriage" element={<AddMarriage />} />
             <Route path="/ViewMarriage" element={<ViewMarriage />} />
             <Route path="/ViewMarriage/:marriageId" element={<ViewMarriage />} />
-            <Route path="/SignIn" element={<SignIn />} />
+            
             <Route path="/SearchFamily" element={<SearchFamily />} />
             <Route path="/family/:family_number" element={<FamilyDetails />} />
             <Route path="/baptism" element={<Baptism />} />

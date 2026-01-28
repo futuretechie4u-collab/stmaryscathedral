@@ -156,9 +156,14 @@ router.post("/fix-baptism-status", async (req, res) => {
 router.post("/", async (req, res) => {
   try {
     console.log("📥 Received baptism data:", req.body);
-    
+
     const {
+      isParishioner,
       member_id,
+      member_name,
+      member_dob,
+      gender,
+      home_parish,
       date_of_baptism,
       place_of_baptism,
       church_where_baptised,
@@ -169,47 +174,16 @@ router.post("/", async (req, res) => {
       remarks
     } = req.body;
 
-    // Get member details
-    const member = await Member.findById(member_id);
-    if (!member) {
-      return res.status(404).json({ error: "Member not found" });
-    }
-
-    // Check if member is already marked as baptized
-    if (member.baptism === true) {
-      return res.status(400).json({ 
-        error: "This member is already marked as baptized in the member records" 
-      });
-    }
-
-    // Check if baptism record already exists
-    const existingBaptism = await Baptism.findOne({ member_id: member_id });
-    if (existingBaptism) {
-      return res.status(400).json({ 
-        error: "A baptism record already exists for this member" 
-      });
-    }
-
-    // Get family details
-    const family = await Family.findOne({ family_number: member.family_number });
-    if (!family) {
-      return res.status(404).json({ error: "Family not found" });
-    }
-
     // Get next serial number
     const lastRecord = await Baptism.findOne().sort({ sl_no: -1 });
     const nextSlNo = lastRecord ? lastRecord.sl_no + 1 : 1;
 
-    // Create baptism record
-    const baptismData = {
+    let baptismData = {
       sl_no: nextSlNo,
-      family_number: family.family_number,
-      family_name: family.name,
-      hof: family.hof,
-      member_id: member._id,
-      member_name: member.name,
-      member_dob: member.dob,
-      gender: member.gender,
+      isParishioner,
+      member_name,
+      member_dob,
+      gender,
       date_of_baptism,
       place_of_baptism,
       church_where_baptised,
@@ -220,38 +194,86 @@ router.post("/", async (req, res) => {
       remarks
     };
 
+    // ----------------------------
+    // ✅ PARISHIONER FLOW
+    // ----------------------------
+    if (isParishioner) {
+      if (!member_id) {
+        return res.status(400).json({ error: "Member ID required for parishioner" });
+      }
+
+      const member = await Member.findById(member_id);
+      if (!member) {
+        return res.status(404).json({ error: "Member not found" });
+      }
+
+      if (member.baptism === true) {
+        return res.status(400).json({ 
+          error: "This member is already marked as baptized" 
+        });
+      }
+
+      const existingBaptism = await Baptism.findOne({ member_id });
+      if (existingBaptism) {
+        return res.status(400).json({ 
+          error: "A baptism record already exists for this member" 
+        });
+      }
+
+      const family = await Family.findOne({ family_number: member.family_number });
+      if (!family) {
+        return res.status(404).json({ error: "Family not found" });
+      }
+
+      baptismData = {
+        ...baptismData,
+        family_number: family.family_number,
+        family_name: family.name,
+        hof: family.hof,
+        member_id: member._id,
+        member_name: member.name,
+        member_dob: member.dob,
+        gender: member.gender
+      };
+
+      // Mark member baptized
+      member.baptism = true;
+      await member.save();
+    }
+
+    // ----------------------------
+    // ✅ NON-PARISHIONER FLOW
+    // ----------------------------
+    if (!isParishioner) {
+      baptismData.home_parish = home_parish || "Unknown";
+      baptismData.member_id = null;
+      baptismData.family_number = null;
+      baptismData.family_name = null;
+      baptismData.hof = null;
+    }
+
     const baptism = new Baptism(baptismData);
     await baptism.save();
-
-    // Update member's baptism status to true
-    member.baptism = true;
-    await member.save();
 
     console.log("✅ Baptism saved:", baptism);
     res.status(201).json({
       message: "Baptism record created successfully",
       data: baptism
     });
+
   } catch (err) {
     console.error("❌ Error:", err);
-    
+
     if (err.code === 11000) {
       return res.status(400).json({ 
-        error: `Duplicate entry: Serial number already exists` 
+        error: "Duplicate entry: Serial number already exists" 
       });
     }
-    
-    if (err.name === 'ValidationError') {
-      const errors = Object.values(err.errors).map(e => e.message);
-      return res.status(400).json({ 
-        error: 'Validation failed',
-        details: errors 
-      });
-    }
-    
+
     res.status(400).json({ error: err.message });
   }
 });
+
 
 // Get all baptism records
 router.get("/", async (req, res) => {
@@ -312,8 +334,13 @@ router.delete("/:id", async (req, res) => {
       return res.status(404).json({ error: "Baptism record not found" });
     }
 
-    // Update member's baptism status back to false
-    await Member.findByIdAndUpdate(baptism.member_id, { baptism: false });
+    // ✅ Only update Member if parishioner
+    if (baptism.member_id) {
+      await Member.findByIdAndUpdate(
+        baptism.member_id,
+        { baptism: false }
+      );
+    }
 
     // Delete baptism record
     await Baptism.findByIdAndDelete(req.params.id);
@@ -325,5 +352,6 @@ router.delete("/:id", async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+
 
 export default router;

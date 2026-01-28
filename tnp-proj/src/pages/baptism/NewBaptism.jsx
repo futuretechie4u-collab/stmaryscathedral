@@ -14,6 +14,8 @@ const NewBaptism = () => {
   const [unbaptizedMembers, setUnbaptizedMembers] = useState([]);
   const [selectedMemberId, setSelectedMemberId] = useState('');
   const [selectedMember, setSelectedMember] = useState(null);
+  const [isParishioner, setIsParishioner] = useState(true);
+
 
   // Baptism form data
   const [formData, setFormData] = useState({
@@ -161,18 +163,23 @@ const NewBaptism = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    if (!selectedMember) {
-      alert('Please select a member to baptize');
-      return;
-    }
+if (isParishioner && !selectedMember) {
+  alert('Please select a member to baptize');
+  return;
+}
 
     setLoading(true);
 
     try {
-      const payload = {
-        member_id: selectedMember._id,
-        ...formData
-      };
+const payload = {
+  isParishioner,
+  ...formData
+};
+
+if (isParishioner) {
+  payload.member_id = selectedMember._id;
+}
+
 
       const res = await fetch('https://stmaryscathedral.onrender.com/api/baptisms', {
         method: 'POST',
@@ -208,6 +215,7 @@ const NewBaptism = () => {
     setUnbaptizedMembers([]);
     setSelectedMemberId('');
     setSelectedMember(null);
+    setIsParishioner(true);
     setFormData({
       date_of_baptism: '',
       place_of_baptism: '',
@@ -247,8 +255,34 @@ const NewBaptism = () => {
 
       <div className="baptism-form-card">
         <form onSubmit={handleSubmit}>
-          
-          {/* Step 1: Search and Select Family Name */}
+          {/* Step 0: Parishioner Selection */}
+<div className="form-section">
+  <h2 className="section-title">0. Parishioner Status</h2>
+  <div className="form-group">
+    <label>
+      <input
+        type="radio"
+        checked={isParishioner}
+        onChange={() => setIsParishioner(true)}
+      /> Parishioner
+    </label>
+    &nbsp;&nbsp;&nbsp;
+    <label>
+      <input
+        type="radio"
+        checked={!isParishioner}
+        onChange={() => setIsParishioner(false)}
+      /> Non-Parishioner
+    </label>
+  </div>
+</div>
+
+{isParishioner && (
+  <>
+    {/* Step 1: Search and Select Family Name */}
+
+
+
           <div className="form-section">
             <h2 className="section-title">1. Select Family Name</h2>
             <div className="search-box">
@@ -368,9 +402,68 @@ const NewBaptism = () => {
               </div>
             </div>
           )}
+            </>
+)}
+{!isParishioner && (
+  <div className="form-section">
+    <h2 className="section-title">Person Details</h2>
+
+    <div className="form-grid">
+      <div className="form-group">
+        <label>Name *</label>
+        <input
+          type="text"
+          name="member_name"
+          required
+          className="form-input"
+          onChange={handleChange}
+        />
+      </div>
+
+      <div className="form-group">
+        <label>Date of Birth *</label>
+        <input
+          type="date"
+          name="member_dob"
+          required
+          className="form-input"
+          onChange={handleChange}
+        />
+      </div>
+
+      <div className="form-group">
+        <label>Gender *</label>
+        <select
+          name="gender"
+          required
+          className="form-select"
+          onChange={handleChange}
+        >
+          <option value="">-- Select --</option>
+          <option value="Male">Male</option>
+          <option value="Female">Female</option>
+        </select>
+      </div>
+
+      <div className="form-group">
+        <label>Home Parish *</label>
+        <input
+          type="text"
+          name="home_parish"
+          required
+          className="form-input"
+          onChange={handleChange}
+        />
+      </div>
+    </div>
+  </div>
+)}
+
+
 
           {/* Step 4: Baptism Details */}
-          {selectedMember && (
+          {(isParishioner ? selectedMember : true) && (
+
             <div className="form-section">
               <h2 className="section-title">4. Enter Baptism Details</h2>
               

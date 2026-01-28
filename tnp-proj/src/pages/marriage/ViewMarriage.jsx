@@ -221,20 +221,32 @@ const ViewMarriage = () => {
           <button
             type="button"
             onClick={() => {
-              const columns = [
-                { key: 'marriageId', header: 'Marriage ID' },
-                { key: 'groom', header: 'Groom' },
-                { key: 'bride', header: 'Bride' },
-                { key: 'date', header: 'Date' },
-                { key: 'place', header: 'Place' },
-              ];
+const columns = [
+  { key: 'marriageId', header: 'Marriage ID' },
+  { key: 'groom', header: 'Groom' },
+  { key: 'groomStatus', header: 'Groom Status' },
+  { key: 'bride', header: 'Bride' },
+  { key: 'brideStatus', header: 'Bride Status' },
+  { key: 'date', header: 'Date' },
+  { key: 'place', header: 'Place' },
+];
+
               const rows = filteredMarriages.map((marriage) => ({
-                marriageId: marriage.marriage_id,
-                groom: marriage.spouse1,
-                bride: marriage.spouse2,
-                date: formatDate(marriage.date),
-                place: marriage.place || 'N/A',
-              }));
+  marriageId: marriage.marriage_id,
+  groom: marriage.spouse1,
+  groomStatus:
+    marriage.isGroomParishioner !== false
+      ? "Parishioner"
+      : "Non-Parishioner",
+  bride: marriage.spouse2,
+  brideStatus:
+    marriage.isBrideParishioner !== false
+      ? "Parishioner"
+      : "Non-Parishioner",
+  date: formatDate(marriage.date),
+  place: marriage.place || 'N/A',
+}));
+
               generateTablePdf({
                 title: 'Marriage Records',
                 columns,
@@ -270,8 +282,26 @@ const ViewMarriage = () => {
                 filteredMarriages.map((marriage) => (
                   <tr key={marriage._id}>
                     <td>{marriage.marriage_id}</td>
-                    <td>{marriage.spouse1}</td>
-                    <td>{marriage.spouse2}</td>
+                    <td>
+  {marriage.spouse1}
+  <br />
+  <small>
+    {marriage.isGroomParishioner !== false
+      ? "Parishioner"
+      : "Non-Parishioner"}
+  </small>
+</td>
+
+<td>
+  {marriage.spouse2}
+  <br />
+  <small>
+    {marriage.isBrideParishioner !== false
+      ? "Parishioner"
+      : "Non-Parishioner"}
+  </small>
+</td>
+
                     <td>{formatDate(marriage.date)}</td>
                     <td>{marriage.place || "N/A"}</td>
                     <td className="action-buttons">

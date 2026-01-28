@@ -31,17 +31,20 @@ const SearchBap = () => {
     if (!search.trim()) return true;
     
     const searchLower = search.toLowerCase();
-    return (
-      (b.member_name || "").toLowerCase().includes(searchLower) ||
-      (b.bapt_name || "").toLowerCase().includes(searchLower) ||
-      (b.family_name || "").toLowerCase().includes(searchLower) ||
-      (b.family_number || "").toLowerCase().includes(searchLower) ||
-      (b.hof || "").toLowerCase().includes(searchLower) ||
-      (b.godparent_name || "").toLowerCase().includes(searchLower) ||
-      (b.place_of_baptism || "").toLowerCase().includes(searchLower) ||
-      (b.church_where_baptised || "").toLowerCase().includes(searchLower) ||
-      (b.certificate_number || "").toLowerCase().includes(searchLower)
-    );
+return (
+  (b.member_name || "").toLowerCase().includes(searchLower) ||
+  (b.bapt_name || "").toLowerCase().includes(searchLower) ||
+  (b.family_name || "").toLowerCase().includes(searchLower) ||
+  (b.family_number || "").toLowerCase().includes(searchLower) ||
+  (b.hof || "").toLowerCase().includes(searchLower) ||
+  (b.godparent_name || "").toLowerCase().includes(searchLower) ||
+  (b.place_of_baptism || "").toLowerCase().includes(searchLower) ||
+  (b.church_where_baptised || "").toLowerCase().includes(searchLower) ||
+  (b.certificate_number || "").toLowerCase().includes(searchLower) ||
+  (b.home_parish || "").toLowerCase().includes(searchLower) ||   // ✅ NEW
+  (b.isParishioner === false && "non parishioner".includes(searchLower)) // ✅ NEW
+);
+
   });
 
   const formatDate = (dateString) => {
@@ -115,6 +118,8 @@ const SearchBap = () => {
                 { key: 'familyName', header: 'Family Name', width: 1.2 },
                 { key: 'hof', header: 'Head of Family', width: 1.4 },
                 { key: 'memberName', header: 'Member Name', width: 1.4 },
+                { key: 'status', header: 'Status', width: 1.2 },
+
                 { key: 'gender', header: 'Gender', width: 0.9 },
                 { key: 'dob', header: 'Date of Birth', width: 1.2 },
                 { key: 'age', header: 'Age', width: 0.8 },
@@ -133,6 +138,7 @@ const SearchBap = () => {
                 familyName: bap.family_name,
                 hof: bap.hof,
                 memberName: bap.member_name,
+                status: bap.isParishioner === false ? 'Non-Parishioner' : 'Parishioner',
                 gender: bap.gender,
                 dob: formatDate(bap.member_dob),
                 age: `${calculateAge(bap.member_dob)} years`,
@@ -191,6 +197,7 @@ const SearchBap = () => {
                 <th>Family Name</th>
                 <th>Head of Family</th>
                 <th>Member Name</th>
+                <th>Status</th>
                 <th>Gender</th>
                 <th>Date of Birth</th>
                 <th>Age</th>
@@ -213,6 +220,19 @@ const SearchBap = () => {
                     <td>{bap.family_name}</td>
                     <td>{bap.hof}</td>
                     <td>{bap.member_name}</td>
+<td>
+  {bap.isParishioner === false ? (
+    <span style={{ color: '#c0392b', fontWeight: '600' }}>
+      Non-Parishioner
+    </span>
+  ) : (
+    <span style={{ color: '#27ae60', fontWeight: '600' }}>
+      Parishioner
+    </span>
+  )}
+</td>
+
+
                     <td>{bap.gender}</td>
                     <td>{formatDate(bap.member_dob)}</td>
                     <td>{calculateAge(bap.member_dob)} years</td>

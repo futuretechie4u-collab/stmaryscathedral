@@ -15,13 +15,63 @@
   margin-bottom: 20px;
   color: #4e342e; /* dark brown */
 }
-
-/* Input group */
+/* Wrapper must be relative */
 .input-group {
   position: relative;
-  margin: 20px 0;
-  flex: 1;
+  margin-bottom: 18px;
 }
+
+/* Suggestions dropdown */
+.suggestions {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+
+  background: #ffffff;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+
+  list-style: none;
+  padding: 0;
+  margin: 0;
+
+  max-height: 220px;
+  overflow-y: auto;
+
+  z-index: 1000; /* VERY IMPORTANT */
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+}
+
+/* Individual item */
+.suggestions li {
+  padding: 10px 14px;
+  cursor: pointer;
+  font-size: 14px;
+  color: #333;
+  transition: background 0.2s ease;
+}
+
+/* Hover */
+.suggestions li:hover {
+  background-color: #f2f6ff;
+}
+
+/* Active / clicked feel */
+.suggestions li:active {
+  background-color: #e6eeff;
+}
+
+/* Scrollbar (optional polish) */
+.suggestions::-webkit-scrollbar {
+  width: 6px;
+}
+
+.suggestions::-webkit-scrollbar-thumb {
+  background-color: #cfcfcf;
+  border-radius: 3px;
+}
+
 
 .input-group input,
 .input-group select,
@@ -74,6 +124,73 @@
 .fetch-btn:hover {
   background: #bcaaa4; /* darker on hover */
 }
+
+/* Toggle row container */
+.toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 12px 0 20px;
+  padding: 10px 14px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: #fafafa;
+}
+
+/* Text label */
+.toggle-label {
+  font-weight: 600;
+  font-size: 14px;
+  color: #333;
+}
+
+/* Switch container */
+.switch {
+  position: relative;
+  width: 44px;
+  height: 22px;
+  flex-shrink: 0;
+}
+
+/* Hide checkbox */
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+/* Slider */
+.slider {
+  position: absolute;
+  cursor: pointer;
+  inset: 0;
+  background-color: #ccc;
+  border-radius: 22px;
+  transition: 0.3s;
+}
+
+/* Knob */
+.slider::before {
+  content: "";
+  position: absolute;
+  height: 16px;
+  width: 16px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  border-radius: 50%;
+  transition: 0.3s;
+}
+
+/* Checked state */
+.switch input:checked + .slider {
+  background-color: #27ae60;
+}
+
+.switch input:checked + .slider::before {
+  transform: translateX(22px);
+}
+
 
 /* Submit button */
 .submit-btn {

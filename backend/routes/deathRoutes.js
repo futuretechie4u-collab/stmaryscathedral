@@ -7,100 +7,124 @@ const router = express.Router();
 // ➕ Add Death Record
 router.post("/", async (req, res) => {
   try {
-    // Separate memberId and nextHofId from the death record data
-    const { memberId, nextHofId, ...deathData } = req.body;
-    
-    // Get the family number from the death data
+    const {
+      isParishioner,
+      memberId,
+      nextHofId,
+      ...deathData
+    } = req.body;
+
+    // ----------------------------
+    // ✅ NON-PARISHIONER FLOW
+    // ----------------------------
+    if (!isParishioner) {
+      const newDeath = new Death({
+        ...deathData,
+        isParishioner: false,
+        member_id: null,
+        family_no: null
+      });
+
+      await newDeath.save();
+
+      return res.status(201).json({
+        message: "Non-parishioner death record added successfully",
+        death: newDeath
+      });
+    }
+
+    // ----------------------------
+    // ✅ PARISHIONER FLOW
+    // ----------------------------
     const familyNumber = deathData.family_no;
 
     if (!memberId || !familyNumber) {
       return res.status(400).json({
-        error: "Missing required fields: memberId and family_no are required."
+        error: "memberId and family_no are required for parishioner death"
       });
     }
 
-    // Find the member *before* updating to check their HoF status
     const memberToDecease = await Member.findById(memberId);
     if (!memberToDecease) {
       return res.status(404).json({ error: "Member not found" });
     }
 
-    const wasHof = memberToDecease.hof; // Store their original HoF status
+    const wasHof = memberToDecease.hof;
 
-    // Save the death record
-    const newDeath = new Death(deathData);
+    const newDeath = new Death({
+      ...deathData,
+      isParishioner: true,
+      member_id: memberId
+    });
     await newDeath.save();
 
-    // Mark the member as deceased and remove HOF status
-    await Member.findByIdAndUpdate(
-      memberId,
-      { hof: false, deceased: true }
-    );
+    // Mark member deceased
+    await Member.findByIdAndUpdate(memberId, {
+      hof: false,
+      deceased: true
+    });
 
-    // If deceased *was* HoF → assign new HoF
+    // ----------------------------
+    // HoF reassignment logic
+    // ----------------------------
     if (wasHof) {
       let newHof;
-      
-      // If a specific next HOF was selected, use it
+
       if (nextHofId) {
         newHof = await Member.findByIdAndUpdate(
           nextHofId,
           { hof: true },
           { new: true }
         );
-        
+
         if (!newHof) {
-          return res.status(404).json({ error: "Selected next HOF not found" });
+          return res.status(404).json({
+            error: "Selected next HOF not found"
+          });
         }
-        
-        console.log(`✅ New HoF manually selected for family ${familyNumber}: ${newHof.name}`);
       } else {
-        // Otherwise, auto-select based on oldest non-deceased member
         newHof = await Member.findOneAndUpdate(
           {
             family_number: familyNumber,
-            _id: { $ne: memberId },  
-            deceased: { $ne: true },
+            _id: { $ne: memberId },
+            deceased: { $ne: true }
           },
           { hof: true },
           {
             new: true,
-            sort: { dob: 1 } // Oldest first
+            sort: { dob: 1 } // oldest first
           }
         );
-        
-        if (!newHof) {
-          console.warn(`⚠️ No eligible new HoF found for family ${familyNumber}`);
-        } else {
-          console.log(`✅ New HoF auto-selected for family ${familyNumber}: ${newHof.name}`);
-        }
       }
     }
 
-    res.status(201).json({ 
-      message: "Death record added successfully", 
-      death: newDeath 
+    res.status(201).json({
+      message: "Parishioner death record added successfully",
+      death: newDeath
     });
-    
+
   } catch (err) {
     console.error("Error adding death record:", err);
-    
-    if (err.name === 'ValidationError') {
-      return res.status(400).json({ 
-        error: "Validation error", 
-        details: err.message 
+
+    if (err.name === "ValidationError") {
+      return res.status(400).json({
+        error: "Validation error",
+        details: err.message
       });
     }
-    
+
     if (err.code === 11000) {
-      return res.status(409).json({ 
-        error: "A death record with this sl_no already exists." 
+      return res.status(409).json({
+        error: "A death record with this sl_no already exists."
       });
     }
-    
-    res.status(500).json({ error: "An internal server error occurred" });
+
+    res.status(500).json({
+      error: "An internal server error occurred"
+    });
   }
 });
+
 
 // 📜 Get All Death Records
 router.get("/", async (req, res) => {
@@ -147,16 +171,24 @@ router.put("/:id", async (req, res) => {
 // ❌ Delete Death Record
 router.delete("/:id", async (req, res) => {
   try {
-    const deletedRecord = await Death.findByIdAndDelete(req.params.id);
-    
-    if (!deletedRecord) {
+    const record = await Death.findById(req.params.id);
+    if (!record) {
       return res.status(404).json({ error: "Death record not found" });
     }
-    
+
+    if (record.member_id) {
+      await Member.findByIdAndUpdate(record.member_id, {
+        deceased: false
+      });
+    }
+
+    await Death.findByIdAndDelete(req.params.id);
+
     res.json({ message: "Death record deleted successfully" });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
+
 
 export default router;

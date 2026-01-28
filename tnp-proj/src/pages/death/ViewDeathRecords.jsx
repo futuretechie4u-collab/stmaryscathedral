@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import "../../css/viewdeath.css";
-import { FaDirections } from "react-icons/fa";
 import { generateTablePdf, generateDeathCertificatePdf } from "../../utils/pdfExport";
 
 const ViewDeathRecords = () => {
@@ -17,7 +16,6 @@ const ViewDeathRecords = () => {
       setLoading(true);
       const API = import.meta.env.VITE_API_URL;
       const res = await fetch(`${API}/api/deaths`);
-
       if (!res.ok) throw new Error("Failed to fetch death records");
       const data = await res.json();
       setRecords(data);
@@ -29,73 +27,68 @@ const ViewDeathRecords = () => {
     }
   };
 
-  // 🔍 Filter logic (search by name, house name, cause, etc.)
+  /* 🔍 Search logic */
   const filteredRecords = records.filter((rec) => {
     if (!search.trim()) return true;
     const s = search.toLowerCase();
+
     return (
       (rec.name || "").toLowerCase().includes(s) ||
       (rec.house_name || "").toLowerCase().includes(s) ||
-      (rec.family_no || "").toLowerCase().includes(s) ||
+      (rec.family_no || "").toString().includes(s) ||
       (rec.address_place || "").toLowerCase().includes(s) ||
       (rec.father_husband_name || "").toLowerCase().includes(s) ||
       (rec.mother_wife_name || "").toLowerCase().includes(s) ||
       (rec.cause_of_death || "").toLowerCase().includes(s) ||
-      (rec.conducted_by || "").toLowerCase().includes(s)
+      (rec.conducted_by || "").toLowerCase().includes(s) ||
+      (rec.isParishioner === false && "non parishioner".includes(s)) ||
+      (rec.isParishioner !== false && "parishioner".includes(s))
     );
   });
 
   return (
     <div className="death-container">
-      {/* 🔍 Search bar */}
+      {/* 🔍 Search */}
       <div className="container-input2">
         <input
           type="text"
-          placeholder="🔍 Search by name, family no, house, cause of death..."
+          placeholder="🔍 Search by name, family no, parishioner, cause..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="input"
         />
       </div>
 
-      {/* Header & Refresh */}
+      {/* Header */}
       <div
         style={{
           display: "flex",
-          justifyContent: "space-between",
-          flexDirection:"column",
+          flexDirection: "column",
           alignItems: "center",
           marginBottom: "20px",
           background: "white",
           padding: "20px 30px",
           borderRadius: "12px",
-          boxShadow: "0 2px 10px rgba(0, 0, 0, 0.08)",
+          boxShadow: "0 2px 10px rgba(0,0,0,0.08)",
         }}
       >
         <h2>Death Records ({filteredRecords.length})</h2>
+
         <div style={{ display: "flex", gap: "10px", marginTop: "10px" }}>
           <button
             onClick={fetchRecords}
-            style={{
-              padding: "12px 24px",
-              background: "linear-gradient(135deg, #ff6a00 0%, #ee0979 100%)",
-              color: "white",
-              border: "none",
-              borderRadius: "8px",
-              cursor: "pointer",
-              fontWeight: "600",
-              fontSize: "15px",
-              boxShadow: "0 4px 12px rgba(238, 9, 121, 0.4)",
-              transition: "all 0.3s ease",
-            }}
+            className="submit-btn"
+            style={{ background: "linear-gradient(135deg,#ff6a00,#ee0979)" }}
           >
             🔄 Refresh
           </button>
+
           <button
             type="button"
             onClick={() => {
               const columns = [
                 { key: "slNo", header: "Sl No" },
+                { key: "status", header: "Status" },
                 { key: "familyNo", header: "Family No" },
                 { key: "name", header: "Name" },
                 { key: "houseName", header: "House Name" },
@@ -110,19 +103,24 @@ const ViewDeathRecords = () => {
                 { key: "cellNo", header: "Cell No" },
                 { key: "remarks", header: "Remarks" },
               ];
+
               const rows = filteredRecords.map((rec, index) => ({
                 slNo: index + 1,
-                familyNo: rec.family_no,
+                status:
+                  rec.isParishioner === false
+                    ? "Non-Parishioner"
+                    : "Parishioner",
+                familyNo: rec.family_no || "-",
                 name: rec.name,
                 houseName: rec.house_name || "-",
                 addressPlace: rec.address_place || "-",
                 fatherHusbandName: rec.father_husband_name || "-",
                 motherWifeName: rec.mother_wife_name || "-",
                 deathDate: rec.death_date
-                  ? new Date(rec.death_date).toLocaleDateString()
+                  ? new Date(rec.death_date).toLocaleDateString("en-IN")
                   : "-",
                 burialDate: rec.burial_date
-                  ? new Date(rec.burial_date).toLocaleDateString()
+                  ? new Date(rec.burial_date).toLocaleDateString("en-IN")
                   : "-",
                 age: rec.age || "-",
                 conductedBy: rec.conducted_by || "-",
@@ -130,6 +128,7 @@ const ViewDeathRecords = () => {
                 cellNo: rec.cell_no || "-",
                 remarks: rec.remarks || "-",
               }));
+
               generateTablePdf({
                 title: "Death Records",
                 columns,
@@ -137,16 +136,8 @@ const ViewDeathRecords = () => {
                 fileName: "death_records.pdf",
               });
             }}
-            style={{
-              padding: "12px 24px",
-              background: "#8b5e3c",
-              color: "white",
-              border: "none",
-              borderRadius: "8px",
-              cursor: "pointer",
-              fontWeight: "600",
-              fontSize: "15px",
-            }}
+            className="submit-btn"
+            style={{ background: "#8b5e3c" }}
           >
             Download PDF
           </button>
@@ -155,38 +146,28 @@ const ViewDeathRecords = () => {
 
       {/* Table */}
       {loading ? (
-        <div
-          style={{
-            textAlign: "center",
-            padding: "60px 20px",
-            color: "#666",
-            background: "white",
-            borderRadius: "12px",
-            boxShadow: "0 4px 20px rgba(0, 0, 0, 0.1)",
-            fontSize: "18px",
-          }}
-        >
-          Loading death records...
-        </div>
+        <div className="loading-box">Loading death records...</div>
       ) : (
         <div className="table-wrapper1">
           <table className="death-table">
             <thead>
               <tr>
                 <th>Sl No</th>
+                <th>Status</th>
                 <th>Family No</th>
                 <th>Name</th>
                 <th>House Name</th>
                 <th>Address/Place</th>
-                <th>Father/Husband Name</th>
-                <th>Mother/Wife Name</th>
+                <th>Father/Husband</th>
+                <th>Mother/Wife</th>
                 <th>Death Date</th>
                 <th>Burial Date</th>
                 <th>Age</th>
                 <th>Conducted by</th>
-                <th>Cause of Death</th>
+                <th>Cause</th>
                 <th>Cell No</th>
                 <th>Remarks</th>
+                <th>Certificate</th>
               </tr>
             </thead>
             <tbody>
@@ -194,7 +175,21 @@ const ViewDeathRecords = () => {
                 filteredRecords.map((rec) => (
                   <tr key={rec._id}>
                     <td>{rec.sl_no}</td>
-                    <td>{rec.family_no}</td>
+                    <td>
+                      <strong
+                        style={{
+                          color:
+                            rec.isParishioner === false
+                              ? "#c0392b"
+                              : "#27ae60",
+                        }}
+                      >
+                        {rec.isParishioner === false
+                          ? "Non-Parishioner"
+                          : "Parishioner"}
+                      </strong>
+                    </td>
+                    <td>{rec.family_no || "-"}</td>
                     <td>{rec.name}</td>
                     <td>{rec.house_name || "-"}</td>
                     <td>{rec.address_place || "-"}</td>
@@ -202,12 +197,12 @@ const ViewDeathRecords = () => {
                     <td>{rec.mother_wife_name || "-"}</td>
                     <td>
                       {rec.death_date
-                        ? new Date(rec.death_date).toLocaleDateString()
+                        ? new Date(rec.death_date).toLocaleDateString("en-IN")
                         : "-"}
                     </td>
                     <td>
                       {rec.burial_date
-                        ? new Date(rec.burial_date).toLocaleDateString()
+                        ? new Date(rec.burial_date).toLocaleDateString("en-IN")
                         : "-"}
                     </td>
                     <td>{rec.age || "-"}</td>
@@ -228,38 +223,8 @@ const ViewDeathRecords = () => {
                 ))
               ) : (
                 <tr>
-                  <td
-                    colSpan="14"
-                    style={{
-                      textAlign: "center",
-                      padding: "60px 20px",
-                      color: "#999",
-                      fontSize: "16px",
-                    }}
-                  >
-                    {search ? (
-                      <>
-                        No death records found matching{" "}
-                        <strong>"{search}"</strong>
-                        <br />
-                        <button
-                          onClick={() => setSearch("")}
-                          style={{
-                            marginTop: "15px",
-                            padding: "10px 20px",
-                            background: "#3498db",
-                            color: "white",
-                            border: "none",
-                            borderRadius: "5px",
-                            cursor: "pointer",
-                          }}
-                        >
-                          Clear Search
-                        </button>
-                      </>
-                    ) : (
-                      "No death records found"
-                    )}
+                  <td colSpan="16" style={{ textAlign: "center", padding: "40px" }}>
+                    No records found
                   </td>
                 </tr>
               )}
@@ -268,20 +233,8 @@ const ViewDeathRecords = () => {
         </div>
       )}
 
-      {/* ✅ Search Result Info */}
       {search && filteredRecords.length > 0 && (
-        <div
-          style={{
-            marginTop: "20px",
-            padding: "15px 25px",
-            background: "linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%)",
-            borderRadius: "8px",
-            color: "#155724",
-            fontWeight: "500",
-            textAlign: "center",
-            boxShadow: "0 2px 8px rgba(0, 0, 0, 0.08)",
-          }}
-        >
+        <div className="search-info">
           ✅ Found {filteredRecords.length} record
           {filteredRecords.length !== 1 ? "s" : ""} matching "{search}"
         </div>

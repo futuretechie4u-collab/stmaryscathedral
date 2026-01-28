@@ -7,53 +7,86 @@ const router = express.Router();
 // ➕ Add Marriage Record
 router.post("/", async (req, res) => {
   try {
-    const { spouse1_id, spouse2_id, marriage_id, date, place, officiant_number } = req.body;
+    const {
+      marriage_id,
+      date,
+      place,
+      officiant_number,
 
-    // Validation
-    if (!spouse1_id || !spouse2_id) {
-      return res.status(400).json({ 
-        error: "Both spouse IDs are required" 
-      });
+      spouse1_isParishioner,
+      spouse1_id,
+      spouse1_name,
+      spouse1_home_parish,
+
+      spouse2_isParishioner,
+      spouse2_id,
+      spouse2_name,
+      spouse2_home_parish
+    } = req.body;
+
+    // ----------------------------
+    // Basic validation
+    // ----------------------------
+    if (!marriage_id || !date) {
+      return res.status(400).json({ error: "Marriage ID and date are required" });
     }
 
-    if (spouse1_id === spouse2_id) {
-      return res.status(400).json({ 
-        error: "Spouses cannot be the same person" 
-      });
+    if (spouse1_isParishioner && !spouse1_id) {
+      return res.status(400).json({ error: "Spouse 1 member required" });
     }
 
-    // Check if members exist
-    const spouse1 = await Member.findById(spouse1_id);
-    const spouse2 = await Member.findById(spouse2_id);
-
-    if (!spouse1 || !spouse2) {
-      return res.status(404).json({ 
-        error: "One or both members not found" 
-      });
+    if (spouse2_isParishioner && !spouse2_id) {
+      return res.status(400).json({ error: "Spouse 2 member required" });
     }
 
-    // Check if either is deceased
-    if (spouse1.deceased || spouse2.deceased) {
-      return res.status(400).json({ 
-        error: "Cannot register marriage for deceased members" 
-      });
+    if (spouse1_id && spouse2_id && spouse1_id === spouse2_id) {
+      return res.status(400).json({ error: "Spouses cannot be the same person" });
     }
 
-    // Check if marriage_id already exists
+    // ----------------------------
+    // Fetch members if parishioners
+    // ----------------------------
+    let spouse1Member = null;
+    let spouse2Member = null;
+
+    if (spouse1_isParishioner) {
+      spouse1Member = await Member.findById(spouse1_id);
+      if (!spouse1Member || spouse1Member.deceased) {
+        return res.status(400).json({ error: "Invalid spouse 1 member" });
+      }
+    }
+
+    if (spouse2_isParishioner) {
+      spouse2Member = await Member.findById(spouse2_id);
+      if (!spouse2Member || spouse2Member.deceased) {
+        return res.status(400).json({ error: "Invalid spouse 2 member" });
+      }
+    }
+
+    // ----------------------------
+    // Duplicate marriage ID check
+    // ----------------------------
     const existingMarriage = await Marriage.findOne({ marriage_id });
     if (existingMarriage) {
-      return res.status(409).json({ 
-        error: "Marriage ID already exists" 
-      });
+      return res.status(409).json({ error: "Marriage ID already exists" });
     }
 
+    // ----------------------------
     // Create marriage record
+    // ----------------------------
     const marriage = new Marriage({
       marriage_id,
-      spouse1_id,
-      spouse1: spouse1.name,
-      spouse2_id,
-      spouse2: spouse2.name,
+
+      spouse1_isParishioner,
+      spouse1_id: spouse1Member?._id || null,
+      spouse1_name: spouse1Member?.name || spouse1_name,
+      spouse1_home_parish: spouse1_isParishioner ? null : spouse1_home_parish,
+
+      spouse2_isParishioner,
+      spouse2_id: spouse2Member?._id || null,
+      spouse2_name: spouse2Member?.name || spouse2_name,
+      spouse2_home_parish: spouse2_isParishioner ? null : spouse2_home_parish,
+
       date,
       place,
       officiant_number
@@ -61,32 +94,37 @@ router.post("/", async (req, res) => {
 
     await marriage.save();
 
-    // Update member records to reflect marital status
-    await Member.findByIdAndUpdate(spouse1_id, { 
-      marital_status: "Married",
-      spouse_id: spouse2_id,
-      spouse_name: spouse2.name
-    });
-    
-    await Member.findByIdAndUpdate(spouse2_id, { 
-      marital_status: "Married",
-      spouse_id: spouse1_id,
-      spouse_name: spouse1.name
-    });
-
-    res.status(201).json({ 
-      message: "Marriage record added successfully",
-      marriage 
-    });
-  } catch (err) {
-    console.error("Error adding marriage:", err);
-    
-    if (err.code === 11000) {
-      return res.status(409).json({ 
-        error: "Duplicate marriage ID" 
+    // ----------------------------
+    // Update member marital status
+    // ----------------------------
+    if (spouse1Member) {
+      await Member.findByIdAndUpdate(spouse1Member._id, {
+        marital_status: "Married",
+        spouse_id: spouse2Member?._id || null,
+        spouse_name: spouse2Member?.name || spouse2_name
       });
     }
-    
+
+    if (spouse2Member) {
+      await Member.findByIdAndUpdate(spouse2Member._id, {
+        marital_status: "Married",
+        spouse_id: spouse1Member?._id || null,
+        spouse_name: spouse1Member?.name || spouse1_name
+      });
+    }
+
+    res.status(201).json({
+      message: "Marriage record added successfully",
+      marriage
+    });
+
+  } catch (err) {
+    console.error("Error adding marriage:", err);
+
+    if (err.code === 11000) {
+      return res.status(409).json({ error: "Duplicate marriage ID" });
+    }
+
     res.status(400).json({ error: err.message });
   }
 });
@@ -232,26 +270,30 @@ router.put("/:id", async (req, res) => {
 router.delete("/:id", async (req, res) => {
   try {
     const marriage = await Marriage.findByIdAndDelete(req.params.id);
-    
+
     if (!marriage) {
       return res.status(404).json({ error: "Marriage not found" });
     }
 
-    // Update member records to remove marital status
-    await Member.findByIdAndUpdate(marriage.spouse1_id, { 
-      marital_status: "Single",
-      $unset: { spouse_id: 1, spouse_name: 1 }
-    });
-    
-    await Member.findByIdAndUpdate(marriage.spouse2_id, { 
-      marital_status: "Single",
-      $unset: { spouse_id: 1, spouse_name: 1 }
-    });
-    
+    if (marriage.spouse1_id) {
+      await Member.findByIdAndUpdate(marriage.spouse1_id, {
+        marital_status: "Single",
+        $unset: { spouse_id: 1, spouse_name: 1 }
+      });
+    }
+
+    if (marriage.spouse2_id) {
+      await Member.findByIdAndUpdate(marriage.spouse2_id, {
+        marital_status: "Single",
+        $unset: { spouse_id: 1, spouse_name: 1 }
+      });
+    }
+
     res.json({ message: "Marriage record deleted successfully" });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
+
 
 export default router;

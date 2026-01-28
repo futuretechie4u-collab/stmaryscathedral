@@ -1,39 +1,64 @@
 import mongoose from "mongoose";
 
 const marriageSchema = new mongoose.Schema({
-  marriage_id: { 
-    type: String, 
-    required: true, 
-    unique: true 
+  marriage_id: {
+    type: String,
+    required: true,
+    unique: true
   },
-  spouse1_id: { 
-    type: mongoose.Schema.Types.ObjectId, 
-    ref: 'Member',
-    required: true 
+
+  // -------------------
+  // Spouse 1
+  // -------------------
+  spouse1_isParishioner: {
+    type: Boolean,
+    required: true
   },
-  spouse1: { 
-    type: String, 
-    required: true 
+  spouse1_id: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Member"
   },
-  spouse2_id: { 
-    type: mongoose.Schema.Types.ObjectId, 
-    ref: 'Member',
-    required: true 
+  spouse1_name: {
+    type: String,
+    required: true
   },
-  spouse2: { 
-    type: String, 
-    required: true 
+  spouse1_home_parish: {
+    type: String
   },
-  date: { 
-    type: Date, 
-    required: true 
+
+  // -------------------
+  // Spouse 2
+  // -------------------
+  spouse2_isParishioner: {
+    type: Boolean,
+    required: true
   },
-  place: { 
-    type: String 
+  spouse2_id: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Member"
   },
-  officiant_number: { 
-    type: String 
+  spouse2_name: {
+    type: String,
+    required: true
+  },
+  spouse2_home_parish: {
+    type: String
+  },
+
+  // -------------------
+  // Marriage Details
+  // -------------------
+  date: {
+    type: Date,
+    required: true
+  },
+  place: {
+    type: String
+  },
+  officiant_number: {
+    type: String
   }
+
 }, { timestamps: true });
 
 export default mongoose.model("Marriage", marriageSchema);

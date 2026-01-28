@@ -11,6 +11,8 @@ const AddDeathRecord = () => {
   const [selectedMember, setSelectedMember] = useState("");
   const [isHof, setIsHof] = useState(false);
   const [nextHof, setNextHof] = useState("");
+  const [isParishioner, setIsParishioner] = useState(true);
+
 
   const [formData, setFormData] = useState({
     sl_no: "",
@@ -50,14 +52,17 @@ const AddDeathRecord = () => {
   }, [searchQuery, families]);
 
   // Fetch members when family selected
-  useEffect(() => {
-    if (selectedHof) {
-      fetch(`https://stmaryscathedral.onrender.com/api/members?family_number=${selectedFamily.family_number}`)
-        .then((res) => res.json())
-        .then((data) => setMembers(data))
-        .catch((err) => console.error("Error fetching members:", err));
-    }
-  }, [selectedHof, selectedFamily]);
+useEffect(() => {
+  if (selectedHof && selectedFamily) {
+    fetch(
+      `https://stmaryscathedral.onrender.com/api/members?family_number=${selectedFamily.family_number}`
+    )
+      .then((res) => res.json())
+      .then((data) => setMembers(data))
+      .catch((err) => console.error("Error fetching members:", err));
+  }
+}, [selectedHof, selectedFamily]);
+
 
   // Autofill when member selected
   useEffect(() => {
@@ -90,41 +95,69 @@ const AddDeathRecord = () => {
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
+  const handleParishionerToggle = (value) => {
+  setIsParishioner(value);
+
+  // 🔥 reset dependent state safely
+  setSelectedFamily(null);
+  setSelectedHof("");
+  setMembers([]);
+  setSelectedMember("");
+  setIsHof(false);
+  setNextHof("");
+
+  setFormData((prev) => ({
+    ...prev,
+    name: "",
+    house_name: "",
+    address_place: "",
+  }));
+};
+
 
   // Submit form
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!selectedFamily || !selectedHof || !selectedMember) {
-      alert("⚠️ Please complete family, HOF, and member selection.");
-      return;
-    }
+if (isParishioner && (!selectedFamily || !selectedHof || !selectedMember)) {
+  alert("⚠️ Please complete family, HOF, and member selection.");
+  return;
+}
+
     if (isHof && !nextHof) {
       alert("⚠️ Please select the next HOF.");
       return;
     }
+    if (!isParishioner && !formData.name.trim()) {
+  alert("⚠️ Name is required for non-parishioner.");
+  return;
+}
+
 
     const payload = {
-      // ✅ Changed 'deceasedId' to 'memberId' to match backend
-      memberId: selectedMember,
-      nextHofId: isHof ? nextHof : null, // ✅ Added nextHofId for manual HOF selection
-      
-      // Death record data
-      sl_no: parseInt(formData.sl_no), // ✅ Convert to number
-      family_no: selectedFamily.family_number,
-      name: formData.name,
-      house_name: formData.house_name,
-      address_place: formData.address_place,
-      father_husband_name: formData.father_husband_name,
-      mother_wife_name: formData.mother_wife_name,
-      death_date: formData.death_date,
-      burial_date: formData.burial_date,
-      age: formData.age ? parseInt(formData.age) : null, // ✅ Convert to number
-      conducted_by: formData.conducted_by, // ✅ Changed from 'church'
-      cause_of_death: formData.cause_of_death,
-      cell_no: formData.cell_no,
-      remarks: formData.remarks,
-    };
+  memberId: isParishioner ? selectedMember : null,
+  nextHofId: isParishioner && isHof ? nextHof : null,
+
+  sl_no: parseInt(formData.sl_no),
+  family_no: isParishioner ? selectedFamily.family_number : null,
+
+  name: formData.name,
+  house_name: formData.house_name,
+  address_place: formData.address_place,
+  father_husband_name: formData.father_husband_name,
+  mother_wife_name: formData.mother_wife_name,
+
+  death_date: formData.death_date,
+  burial_date: formData.burial_date,
+  age: formData.age ? parseInt(formData.age) : null,
+
+  conducted_by: formData.conducted_by,
+  cause_of_death: formData.cause_of_death,
+  cell_no: formData.cell_no,
+  remarks: formData.remarks,
+
+  isParishioner: Boolean(isParishioner), 
+};
 
     try {
       const res = await fetch("https://stmaryscathedral.onrender.com/api/deaths", {
@@ -171,105 +204,160 @@ const AddDeathRecord = () => {
     }
   };
 
-  return (
-    <div className="container">
-      <form className="register-form" onSubmit={handleSubmit}>
-        <h2>Add Death Record</h2>
+ return (
+  <div className="container">
+    <form className="register-form" onSubmit={handleSubmit}>
 
-        {/* Search Family */}
-        <div className="input-group">
-          <label>Search Family</label>
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Type family name..."
-          />
-          {filteredFamilies.length > 0 && (
-            <ul className="suggestions">
-              {filteredFamilies.map((fam) => (
-                <li
-                  key={fam._id}
-                  onClick={() => {
-                    setSelectedFamily(fam);
-                    setSearchQuery(fam.name);
-                    setFilteredFamilies([]);
-                    const sameNameFamilies = families.filter((f) => f.name === fam.name);
-                    if (sameNameFamilies.length === 1) {
-                      setSelectedHof(fam.hof);
-                    } else {
-                      setSelectedHof("");
-                    }
-                  }}
+
+
+      <h2>Add Death Record</h2>
+
+{/* Parishioner Toggle */}
+<div className="toggle-row">
+  <span className="toggle-label">
+    {isParishioner ? "Parishioner" : "Non-Parishioner"}
+  </span>
+
+  <label className="switch">
+<input
+  type="radio"
+  checked={isParishioner}
+  onChange={() => handleParishionerToggle(true)}
+/>
+
+<input
+  type="radio"
+  checked={!isParishioner}
+  onChange={() => handleParishionerToggle(false)}
+/>
+
+    <span className="slider"></span>
+  </label>
+</div>
+
+
+
+      {/* ================= PARISHIONER FLOW ================= */}
+      {isParishioner && (
+        <>
+          {/* Search Family */}
+          <div className="input-group">
+            <label>Search Family</label>
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Type family name..."
+            />
+            {filteredFamilies.length > 0 && (
+              <ul className="suggestions">
+                {filteredFamilies.map((fam) => (
+                  <li
+                    key={fam._id}
+                    onClick={() => {
+                      setSelectedFamily(fam);
+                      setSearchQuery(fam.name);
+                      setFilteredFamilies([]);
+                      const sameNameFamilies = families.filter(
+                        (f) => f.name === fam.name
+                      );
+                      if (sameNameFamilies.length === 1) {
+                        setSelectedHof(fam.hof);
+                      } else {
+                        setSelectedHof("");
+                      }
+                    }}
+                  >
+                    {fam.name}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+
+          {/* HOF dropdown */}
+          {selectedFamily &&
+            families.filter((f) => f.name === selectedFamily.name).length > 1 && (
+              <div className="input-group">
+                <label>Select HOF</label>
+                <select
+                  value={selectedHof}
+                  onChange={(e) => setSelectedHof(e.target.value)}
+                  required
                 >
-                  {fam.name}
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
+                  <option value="">Select HOF</option>
+                  {families
+                    .filter((f) => f.name === selectedFamily.name)
+                    .map((f) => (
+                      <option key={f._id} value={f.hof}>
+                        {f.hof}
+                      </option>
+                    ))}
+                </select>
+              </div>
+            )}
 
-        {/* HOF dropdown if multiple families with same name */}
-        {selectedFamily &&
-          families.filter((f) => f.name === selectedFamily.name).length > 1 && (
+          {/* Member dropdown */}
+          {selectedHof && members.length > 0 && (
             <div className="input-group">
-              <label>Select HOF</label>
+              <label>Select Member (Deceased)</label>
               <select
-                value={selectedHof}
-                onChange={(e) => setSelectedHof(e.target.value)}
+                value={selectedMember}
+                onChange={(e) => setSelectedMember(e.target.value)}
                 required
               >
-                <option value="">Select HOF</option>
-                {families
-                  .filter((f) => f.name === selectedFamily.name)
-                  .map((f) => (
-                    <option key={f._id} value={f.hof}>
-                      {f.hof}
+                <option value="">Select Member</option>
+                {members.map((m) => (
+                  <option key={m._id} value={m._id}>
+                    {m.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+
+          {/* Next HOF */}
+          {isHof && (
+            <div className="input-group">
+              <label>Select Next HOF</label>
+              <select
+                value={nextHof}
+                onChange={(e) => setNextHof(e.target.value)}
+                required
+              >
+                <option value="">Select Next HOF</option>
+                {members
+                  .filter((m) => m._id !== selectedMember)
+                  .map((m) => (
+                    <option key={m._id} value={m._id}>
+                      {m.name}
                     </option>
                   ))}
               </select>
             </div>
           )}
+        </>
+      )}
 
-        {/* Member dropdown */}
-        {selectedHof && members.length > 0 && (
+      {/* ================= NON-PARISHIONER FLOW ================= */}
+      {!isParishioner && (
+        <>
           <div className="input-group">
-            <label>Select Member (Deceased)</label>
-            <select
-              value={selectedMember}
-              onChange={(e) => setSelectedMember(e.target.value)}
+            <input
+              type="text"
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
               required
-            >
-              <option value="">Select Member</option>
-              {members.map((m) => (
-                <option key={m._id} value={m._id}>
-                  {m.name}
-                </option>
-              ))}
-            </select>
+            />
+            <label>Name *</label>
           </div>
-        )}
+        </>
+      )}
 
-        {/* Next HOF if deceased was HOF */}
-        {isHof && (
-          <div className="input-group">
-            <label>Select Next HOF</label>
-            <select
-              value={nextHof}
-              onChange={(e) => setNextHof(e.target.value)}
-              required
-            >
-              <option value="">Select Next HOF</option>
-              {members
-                .filter((m) => m._id !== selectedMember)
-                .map((m) => (
-                  <option key={m._id} value={m._id}>
-                    {m.name}
-                  </option>
-                ))}
-            </select>
-          </div>
-        )}
+
+
+
 
         {/* Rest of form inputs */}
         <div className="input-group">

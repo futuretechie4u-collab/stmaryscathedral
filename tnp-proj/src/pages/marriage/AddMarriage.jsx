@@ -131,22 +131,22 @@ const [manualBrideName, setManualBrideName] = useState("");
     return;
   }
 
-  const payload = {
-    marriage_id: marriageData.marriage_id,
+const payload = {
+  marriage_id: marriageData.marriage_id,
 
-    spouse1_id: isGroomParishioner ? selectedGroom._id : null,
-    spouse1: isGroomParishioner ? selectedGroom.name : manualGroomName,
+  spouse1_id: isGroomParishioner ? selectedGroom?._id : null,
+  spouse1_name: isGroomParishioner ? selectedGroom?.name : manualGroomName,
+  spouse1_isParishioner: isGroomParishioner,
 
-    spouse2_id: isBrideParishioner ? selectedBride._id : null,
-    spouse2: isBrideParishioner ? selectedBride.name : manualBrideName,
+  spouse2_id: isBrideParishioner ? selectedBride?._id : null,
+  spouse2_name: isBrideParishioner ? selectedBride?.name : manualBrideName,
+  spouse2_isParishioner: isBrideParishioner,
 
-    date: marriageData.date,
-    place: marriageData.place,
-    officiant_number: marriageData.officiant_number,
+  date: marriageData.date,
+  place: marriageData.place,
+  officiant_number: marriageData.officiant_number
+};
 
-    isGroomParishioner,
-    isBrideParishioner
-  };
 
   try {
     const res = await fetch(
@@ -455,25 +455,24 @@ const [manualBrideName, setManualBrideName] = useState("");
               />
             </div>
           </div>
+<div className="marriage-summary">
+  <h3>Selected Couple:</h3>
+  <div className="marriage-couple-info">
+    <div>
+      <strong>Groom:</strong>{" "}
+      {isGroomParishioner
+        ? selectedGroom?.name || "Not selected"
+        : manualGroomName || "Not selected"}
+    </div>
+    <div>
+      <strong>Bride:</strong>{" "}
+      {isBrideParishioner
+        ? selectedBride?.name || "Not selected"
+        : manualBrideName || "Not selected"}
+    </div>
+  </div>
+</div>
 
-          <div className="marriage-summary">
-            <h3>Selected Couple:</h3>
-            <div className="marriage-couple-info">
-              <div>
-                <strong>Groom:</strong> {selectedGroom ? selectedGroom.name : "Not selected"}
-                {isGroomParishioner
-  ? selectedGroom?.name || "Not selected"
-  : manualGroomName || "Not entered"}
-              </div>
-              <div>
-                <strong>Bride:</strong> {selectedBride ? selectedBride.name : "Not selected"}
-                {isBrideParishioner
-  ? selectedBride?.name || "Not selected"
-  : manualBrideName || "Not entered"}
-
-              </div>
-            </div>
-          </div>
 
           <button type="submit" className="marriage-submit-btn">
             Register Marriage

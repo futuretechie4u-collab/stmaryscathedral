@@ -48,13 +48,36 @@ router.get("/:id", async (req, res) => {
 // Update member
 router.put("/:id", async (req, res) => {
   try {
-    const updatedMember = await Member.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    const updateData = {
+      name: req.body.name,
+      gender: req.body.gender,
+      relation: req.body.relation,
+      dob: req.body.dob,
+      age: req.body.age,
+      occupation: req.body.occupation,
+      phone: req.body.phone,
+      email: req.body.email,
+
+      blood_group: req.body.blood_group,
+      aadhaar: req.body.aadhaar,
+      family_number: req.body.family_number,
+      hof: req.body.hof,
+      baptism: req.body.baptism,
+      deceased: req.body.deceased
+    };
+
+    const updatedMember = await Member.findByIdAndUpdate(
+      req.params.id,
+      updateData,
+      { new: true }
+    );
+
     res.json(updatedMember);
+
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
 });
-
 // Delete member
 router.delete("/:id", async (req, res) => {
   try {

@@ -106,28 +106,33 @@ const EditMember = () => {
   };
 
   // ✅ Select member
-  const handleSelectMember = (memberId) => {
-    setSelectedMember(memberId);
-    const memberObj = members.find((m) => m._id === memberId);
-    if (memberObj) {
-      setFormData((prev) => ({
-        ...prev,
-        firstname: memberObj.name?.split(" ")[0] || "",
-        lastname: memberObj.name?.split(" ")[1] || "",
-        gender: memberObj.gender || "",
-        relation: memberObj.relation || "",
-        dob: memberObj.dob ? memberObj.dob.split("T")[0] : "",
-        age: memberObj.age || "",
-        occupation: memberObj.occupation || "",
-        phone: memberObj.phone || "",
-        email: memberObj.email || "",
-        blood_group: memberObj.blood_group || "",
-        aadhaar: memberObj.aadhaar || "",
-        hof: memberObj.hof ? "Yes" : "No",
-        baptismStatus: memberObj.baptism ? "Yes" : "No",
-      }));
-    }
-  };
+const handleSelectMember = (memberId) => {
+  setSelectedMember(memberId);
+  const memberObj = members.find((m) => m._id === memberId);
+
+  if (memberObj) {
+    const nameParts = memberObj.name?.split(" ") || [];
+
+    setFormData((prev) => ({
+      ...prev,
+      firstname: nameParts[0] || "",
+      lastname: nameParts.slice(1).join(" ") || "",
+      gender: memberObj.gender || "",
+      relation: memberObj.relation || "",
+      dob: memberObj.dob ? memberObj.dob.split("T")[0] : "",
+      age: memberObj.age || "",
+      occupation: memberObj.occupation || "",
+      phone: memberObj.phone || "",
+      email: memberObj.email || "",
+
+      blood_group: memberObj.blood_group || "",
+
+      aadhaar: memberObj.aadhaar || "",
+      hof: memberObj.hof ? "Yes" : "No",
+      baptismStatus: memberObj.baptism ? "Yes" : "No",
+    }));
+  }
+};
 
   // ✅ Handle typing in form
   const handleChange = (e) => {

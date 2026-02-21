@@ -75,7 +75,7 @@ const ViewMembers = () => {
                 occupation: member.occupation || "",
                 phone: member.phone || "",
                 email: member.email || "",
-                bloodGroup: member.blog_group || "",
+                bloodGroup: member.blood_group || "",
                 aadhaar: member.aadhaar || member.aadhaar || "",
                 familyNumber: member.family_number || member.familyNo || "",
                 hof: member.hof || member.isHof ? "Yes" : "No",
@@ -129,7 +129,7 @@ const ViewMembers = () => {
                     <td>{member.occupation || ""}</td>
                     <td>{member.phone || ""}</td>
                     <td>{member.email || ""}</td>
-                    <td>{member.blog_group || ""}</td>
+                    <td>{member.blood_group || ""}</td>
                     <td>{member.aadhaar || member.aadhaar || ""}</td>
                     <td>{member.family_number || member.familyNo || ""}</td>
                     <td>{member.hof || member.isHof ? "Yes" : "No"}</td>

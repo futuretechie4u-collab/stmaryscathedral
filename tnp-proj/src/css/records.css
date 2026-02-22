@@ -1,0 +1,247 @@
+/* PAGE CONTAINER */
+.page,
+.member-table-container1,
+.death-container,
+.view-marriage-container {
+  padding: 30px;
+  background: #f4f6fb;
+  min-height: 100vh;
+  box-sizing: border-box;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+}
+
+/* HEADER BAR */
+.header,
+.marriage-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: white;
+  padding: 16px 20px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+/* HEADER TITLE */
+.header h2,
+.marriage-header h1 {
+  margin: 0;
+}
+
+/* HEADER CONTROLS */
+.header-controls,
+.marriage-filters {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* SEARCH INPUT */
+.search,
+.input,
+.filter-input {
+  padding: 8px 12px;
+  width: 220px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+}
+
+/* HEADER BUTTONS */
+.header-btn,
+.clear-filters-btn {
+  padding: 8px 16px;
+  background: #8b5e3c;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.header-btn:hover,
+.clear-filters-btn:hover {
+  background: #6d472d;
+}
+
+/* TABLE WRAPPER */
+.table-wrapper1,
+.marriage-table-wrapper {
+  background: white;
+  border-radius: 10px;
+  overflow-x: auto;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+/* TABLE */
+.table,
+.member-table,
+.death-table,
+.view-marriage-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+/* TABLE HEADER */
+.table th,
+.member-table th,
+.death-table th,
+.view-marriage-table th {
+  background: #8b5e3c;
+  color: white;
+  padding: 12px 15px;
+  text-align: left;
+  font-weight: 600;
+}
+
+/* TABLE CELLS */
+.table td,
+.member-table td,
+.death-table td,
+.view-marriage-table td {
+  padding: 12px 15px;
+  border-bottom: 1px solid #eee;
+  vertical-align: middle;
+}
+
+/* ROW HOVER */
+.table tr:hover,
+.member-table tr:hover,
+.death-table tr:hover,
+.view-marriage-table tr:hover {
+  background: #f9fafc;
+}
+
+/* ACTION BUTTON GROUP */
+.actions,
+.action-buttons {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+/* BUTTON BASE */
+button {
+  border: none;
+  border-radius: 6px;
+  padding: 6px 12px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+/* EDIT BUTTON */
+.edit,
+.btn-edit {
+  background: #f39c12;
+  color: white;
+}
+
+.edit:hover,
+.btn-edit:hover {
+  background: #d68910;
+}
+
+/* DELETE BUTTON */
+.delete,
+.btn-delete {
+  background: #e74c3c;
+  color: white;
+}
+
+.delete:hover,
+.btn-delete:hover {
+  background: #c0392b;
+}
+
+/* CERTIFICATE BUTTON */
+.cert,
+.submit-btn,
+.btn-view {
+  background: #27ae60;
+  color: white;
+}
+
+.cert:hover,
+.submit-btn:hover,
+.btn-view:hover {
+  background: #1e8449;
+}
+
+/* LOADING BOX */
+.loading,
+.loading-box {
+  background: white;
+  padding: 30px;
+  border-radius: 10px;
+  text-align: center;
+}
+
+/* MODAL OVERLAY */
+.modal-bg,
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+/* MODAL */
+.modal,
+.modal-content {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  width: 400px;
+  max-width: 90%;
+}
+
+/* MODAL INPUT */
+.modal input,
+.modal-content input {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+/* MODAL BUTTONS */
+.modal button,
+.modal-content button {
+  margin-right: 8px;
+}
+
+/* STATUS COLORS */
+.status-parishioner {
+  color: #27ae60;
+  font-weight: 600;
+}
+
+.status-non-parishioner {
+  color: #c0392b;
+  font-weight: 600;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+
+  .header,
+  .marriage-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .header-controls,
+  .marriage-filters {
+    flex-wrap: wrap;
+  }
+
+}

@@ -3,9 +3,15 @@ import "../../css/viewdeath.css";
 import { generateTablePdf, generateDeathCertificatePdf } from "../../utils/pdfExport";
 
 const ViewDeathRecords = () => {
+
   const [records, setRecords] = useState([]);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
+
+  // Edit modal state
+  const [editModal, setEditModal] = useState(false);
+  const [editData, setEditData] = useState({});
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     fetchRecords();
@@ -21,17 +27,79 @@ const ViewDeathRecords = () => {
       setRecords(data);
     } catch (err) {
       console.error(err);
-      alert("❌ Error fetching records: " + err.message);
+      alert("❌ Error fetching records");
     } finally {
       setLoading(false);
     }
   };
 
-  /* 🔍 Search logic */
+  /* DELETE */
+  const handleDelete = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this record?")) return;
+    try {
+      const API = import.meta.env.VITE_API_URL;
+      const res = await fetch(`${API}/api/deaths/${id}`, { method: "DELETE" });
+      if (!res.ok) throw new Error();
+      alert("Deleted successfully");
+      fetchRecords();
+    } catch {
+      alert("Delete failed");
+    }
+  };
+
+  /* OPEN EDIT MODAL — pre-fill all fields */
+  const handleEdit = (rec) => {
+    setEditData({
+      _id: rec._id,
+      isParishioner: rec.isParishioner !== false,
+      family_no: rec.family_no || "",
+      name: rec.name || "",
+      house_name: rec.house_name || "",
+      address_place: rec.address_place || "",
+      father_husband_name: rec.father_husband_name || "",
+      mother_wife_name: rec.mother_wife_name || "",
+      death_date: rec.death_date ? rec.death_date.split("T")[0] : "",
+      burial_date: rec.burial_date ? rec.burial_date.split("T")[0] : "",
+      age: rec.age || "",
+      conducted_by: rec.conducted_by || "",
+      cause_of_death: rec.cause_of_death || "",
+      cell_no: rec.cell_no || "",
+      remarks: rec.remarks || "",
+    });
+    setEditModal(true);
+  };
+
+  /* HANDLE INPUT CHANGE IN MODAL */
+  const handleEditChange = (e) => {
+    const { name, value } = e.target;
+    setEditData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  /* SAVE — PUT request */
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      const API = import.meta.env.VITE_API_URL;
+      const res = await fetch(`${API}/api/deaths/${editData._id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(editData),
+      });
+      if (!res.ok) throw new Error();
+      alert("✅ Record updated successfully");
+      setEditModal(false);
+      fetchRecords();
+    } catch {
+      alert("❌ Update failed");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  /* SEARCH */
   const filteredRecords = records.filter((rec) => {
     if (!search.trim()) return true;
     const s = search.toLowerCase();
-
     return (
       (rec.name || "").toLowerCase().includes(s) ||
       (rec.house_name || "").toLowerCase().includes(s) ||
@@ -40,15 +108,14 @@ const ViewDeathRecords = () => {
       (rec.father_husband_name || "").toLowerCase().includes(s) ||
       (rec.mother_wife_name || "").toLowerCase().includes(s) ||
       (rec.cause_of_death || "").toLowerCase().includes(s) ||
-      (rec.conducted_by || "").toLowerCase().includes(s) ||
-      (rec.isParishioner === false && "non parishioner".includes(s)) ||
-      (rec.isParishioner !== false && "parishioner".includes(s))
+      (rec.conducted_by || "").toLowerCase().includes(s)
     );
   });
 
   return (
     <div className="death-container">
-      {/* 🔍 Search */}
+
+      {/* SEARCH */}
       <div className="container-input2">
         <input
           type="text"
@@ -59,22 +126,10 @@ const ViewDeathRecords = () => {
         />
       </div>
 
-      {/* Header */}
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          marginBottom: "20px",
-          background: "white",
-          padding: "20px 30px",
-          borderRadius: "12px",
-          boxShadow: "0 2px 10px rgba(0,0,0,0.08)",
-        }}
-      >
+      {/* HEADER */}
+      <div className="death-header">
         <h2>Death Records ({filteredRecords.length})</h2>
-
-        <div style={{ display: "flex", gap: "10px", marginTop: "10px" }}>
+        <div className="death-header-buttons">
           <button
             onClick={fetchRecords}
             className="submit-btn"
@@ -82,9 +137,10 @@ const ViewDeathRecords = () => {
           >
             🔄 Refresh
           </button>
-
           <button
             type="button"
+            className="submit-btn"
+            style={{ background: "#8b5e3c" }}
             onClick={() => {
               const columns = [
                 { key: "slNo", header: "Sl No" },
@@ -103,48 +159,32 @@ const ViewDeathRecords = () => {
                 { key: "cellNo", header: "Cell No" },
                 { key: "remarks", header: "Remarks" },
               ];
-
               const rows = filteredRecords.map((rec, index) => ({
                 slNo: index + 1,
-                status:
-                  rec.isParishioner === false
-                    ? "Non-Parishioner"
-                    : "Parishioner",
+                status: rec.isParishioner === false ? "Non-Parishioner" : "Parishioner",
                 familyNo: rec.family_no || "-",
                 name: rec.name,
                 houseName: rec.house_name || "-",
                 addressPlace: rec.address_place || "-",
                 fatherHusbandName: rec.father_husband_name || "-",
                 motherWifeName: rec.mother_wife_name || "-",
-                deathDate: rec.death_date
-                  ? new Date(rec.death_date).toLocaleDateString("en-IN")
-                  : "-",
-                burialDate: rec.burial_date
-                  ? new Date(rec.burial_date).toLocaleDateString("en-IN")
-                  : "-",
+                deathDate: rec.death_date ? new Date(rec.death_date).toLocaleDateString("en-IN") : "-",
+                burialDate: rec.burial_date ? new Date(rec.burial_date).toLocaleDateString("en-IN") : "-",
                 age: rec.age || "-",
                 conductedBy: rec.conducted_by || "-",
                 causeOfDeath: rec.cause_of_death || "-",
                 cellNo: rec.cell_no || "-",
                 remarks: rec.remarks || "-",
               }));
-
-              generateTablePdf({
-                title: "Death Records",
-                columns,
-                rows,
-                fileName: "death_records.pdf",
-              });
+              generateTablePdf({ title: "Death Records", columns, rows, fileName: "death_records.pdf" });
             }}
-            className="submit-btn"
-            style={{ background: "#8b5e3c" }}
           >
             Download PDF
           </button>
         </div>
       </div>
 
-      {/* Table */}
+      {/* TABLE */}
       {loading ? (
         <div className="loading-box">Loading death records...</div>
       ) : (
@@ -167,78 +207,151 @@ const ViewDeathRecords = () => {
                 <th>Cause</th>
                 <th>Cell No</th>
                 <th>Remarks</th>
-                <th>Certificate</th>
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody>
-              {filteredRecords.length > 0 ? (
-                filteredRecords.map((rec) => (
-                  <tr key={rec._id}>
-                    <td>{rec.sl_no}</td>
-                    <td>
-                      <strong
-                        style={{
-                          color:
-                            rec.isParishioner === false
-                              ? "#c0392b"
-                              : "#27ae60",
-                        }}
-                      >
-                        {rec.isParishioner === false
-                          ? "Non-Parishioner"
-                          : "Parishioner"}
-                      </strong>
-                    </td>
-                    <td>{rec.family_no || "-"}</td>
-                    <td>{rec.name}</td>
-                    <td>{rec.house_name || "-"}</td>
-                    <td>{rec.address_place || "-"}</td>
-                    <td>{rec.father_husband_name || "-"}</td>
-                    <td>{rec.mother_wife_name || "-"}</td>
-                    <td>
-                      {rec.death_date
-                        ? new Date(rec.death_date).toLocaleDateString("en-IN")
-                        : "-"}
-                    </td>
-                    <td>
-                      {rec.burial_date
-                        ? new Date(rec.burial_date).toLocaleDateString("en-IN")
-                        : "-"}
-                    </td>
-                    <td>{rec.age || "-"}</td>
-                    <td>{rec.conducted_by || "-"}</td>
-                    <td>{rec.cause_of_death || "-"}</td>
-                    <td>{rec.cell_no || "-"}</td>
-                    <td>{rec.remarks || "-"}</td>
-                    <td>
-                      <button
-                        type="button"
-                        onClick={() => generateDeathCertificatePdf(rec)}
-                        className="submit-btn"
-                      >
-                        Certificate
-                      </button>
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan="16" style={{ textAlign: "center", padding: "40px" }}>
-                    No records found
+              {filteredRecords.map((rec, index) => (
+                <tr key={rec._id}>
+                  <td>{index + 1}</td>
+                  <td>{rec.isParishioner === false ? "Non-Parishioner" : "Parishioner"}</td>
+                  <td>{rec.family_no}</td>
+                  <td>{rec.name}</td>
+                  <td>{rec.house_name}</td>
+                  <td>{rec.address_place}</td>
+                  <td>{rec.father_husband_name}</td>
+                  <td>{rec.mother_wife_name}</td>
+                  <td>{rec.death_date ? new Date(rec.death_date).toLocaleDateString("en-IN") : "-"}</td>
+                  <td>{rec.burial_date ? new Date(rec.burial_date).toLocaleDateString("en-IN") : "-"}</td>
+                  <td>{rec.age}</td>
+                  <td>{rec.conducted_by}</td>
+                  <td>{rec.cause_of_death}</td>
+                  <td>{rec.cell_no}</td>
+                  <td>{rec.remarks}</td>
+                  <td className="actions-cell">
+                    <button onClick={() => handleEdit(rec)} className="submit-btn" style={{ background: "#f39c12" }}>
+                      Edit
+                    </button>
+                    <button onClick={() => handleDelete(rec._id)} className="submit-btn" style={{ background: "#e74c3c" }}>
+                      Delete
+                    </button>
+                    <button onClick={() => generateDeathCertificatePdf(rec)} className="submit-btn">
+                      Certificate
+                    </button>
                   </td>
                 </tr>
-              )}
+              ))}
             </tbody>
           </table>
         </div>
       )}
 
-      {search && filteredRecords.length > 0 && (
-        <div className="search-info">
-          ✅ Found {filteredRecords.length} record
-          {filteredRecords.length !== 1 ? "s" : ""} matching "{search}"
+      {/* EDIT MODAL */}
+      {editModal && (
+        <div className="modal-overlay" onClick={() => setEditModal(false)}>
+          <div className="modal-box" onClick={(e) => e.stopPropagation()}>
+
+            <div className="modal-header">
+              <h3>✏️ Edit Death Record</h3>
+              <button className="modal-close" onClick={() => setEditModal(false)}>✕</button>
+            </div>
+
+            <div className="modal-body">
+
+              <div className="modal-section-title">General Info</div>
+              <div className="modal-grid">
+                <div className="modal-field">
+                  <label>Status</label>
+                  <select
+                    name="isParishioner"
+                    value={editData.isParishioner}
+                    onChange={(e) => setEditData((p) => ({ ...p, isParishioner: e.target.value === "true" }))}
+                  >
+                    <option value="true">Parishioner</option>
+                    <option value="false">Non-Parishioner</option>
+                  </select>
+                </div>
+                <div className="modal-field">
+                  <label>Family No</label>
+                  <input name="family_no" value={editData.family_no} onChange={handleEditChange} />
+                </div>
+                <div className="modal-field">
+                  <label>Name</label>
+                  <input name="name" value={editData.name} onChange={handleEditChange} />
+                </div>
+                <div className="modal-field">
+                  <label>House Name</label>
+                  <input name="house_name" value={editData.house_name} onChange={handleEditChange} />
+                </div>
+                <div className="modal-field modal-field-full">
+                  <label>Address / Place</label>
+                  <input name="address_place" value={editData.address_place} onChange={handleEditChange} />
+                </div>
+              </div>
+
+              <div className="modal-section-title">Family Info</div>
+              <div className="modal-grid">
+                <div className="modal-field">
+                  <label>Father / Husband Name</label>
+                  <input name="father_husband_name" value={editData.father_husband_name} onChange={handleEditChange} />
+                </div>
+                <div className="modal-field">
+                  <label>Mother / Wife Name</label>
+                  <input name="mother_wife_name" value={editData.mother_wife_name} onChange={handleEditChange} />
+                </div>
+              </div>
+
+              <div className="modal-section-title">Death & Burial</div>
+              <div className="modal-grid">
+                <div className="modal-field">
+                  <label>Death Date</label>
+                  <input type="date" name="death_date" value={editData.death_date} onChange={handleEditChange} />
+                </div>
+                <div className="modal-field">
+                  <label>Burial Date</label>
+                  <input type="date" name="burial_date" value={editData.burial_date} onChange={handleEditChange} />
+                </div>
+                <div className="modal-field">
+                  <label>Age</label>
+                  <input name="age" value={editData.age} onChange={handleEditChange} />
+                </div>
+                <div className="modal-field">
+                  <label>Conducted By</label>
+                  <input name="conducted_by" value={editData.conducted_by} onChange={handleEditChange} />
+                </div>
+                <div className="modal-field modal-field-full">
+                  <label>Cause of Death</label>
+                  <input name="cause_of_death" value={editData.cause_of_death} onChange={handleEditChange} />
+                </div>
+              </div>
+
+              <div className="modal-section-title">Other</div>
+              <div className="modal-grid">
+                <div className="modal-field">
+                  <label>Cell No</label>
+                  <input name="cell_no" value={editData.cell_no} onChange={handleEditChange} />
+                </div>
+                <div className="modal-field modal-field-full">
+                  <label>Remarks</label>
+                  <textarea name="remarks" value={editData.remarks} onChange={handleEditChange} rows={3} />
+                </div>
+              </div>
+
+            </div>
+
+            <div className="modal-footer">
+              <button className="submit-btn" style={{ background: "#aaa" }} onClick={() => setEditModal(false)}>
+                Cancel
+              </button>
+              <button className="submit-btn" style={{ background: "#4caf50" }} onClick={handleSave} disabled={saving}>
+                {saving ? "Saving..." : "💾 Save Changes"}
+              </button>
+            </div>
+
+          </div>
         </div>
       )}
+
     </div>
   );
 };

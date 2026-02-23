@@ -3,81 +3,243 @@ import Family from "../models/Family.js";
 
 const router = express.Router();
 
-// Create family
+
+// ✅ CREATE FAMILY
 router.post("/", async (req, res) => {
+
   try {
-    const exists = await Family.findOne({ family_number: req.body.family_number });
+
+    const exists = await Family.findOne({
+      family_number: req.body.family_number
+    });
+
     if (exists) {
-      return res.status(400).json({ error: "Family number already exists" });
+      return res.status(400).json({
+        error: "Family number already exists"
+      });
     }
 
     const family = new Family(req.body);
+
     await family.save();
-    res.status(201).json({ message: "Family added successfully", family });
+
+    res.status(201).json({
+      message: "Family added successfully",
+      family
+    });
+
   } catch (err) {
-    res.status(400).json({ error: err.message });
+
+    res.status(400).json({
+      error: err.message
+    });
+
   }
+
 });
 
-// Get all families
+
+
+// ✅ GET ALL FAMILIES
 router.get("/", async (req, res) => {
+
   try {
+
     const families = await Family.find().lean();
+
     res.json(families);
+
   } catch (err) {
-    res.status(500).json({ error: err.message });
+
+    res.status(500).json({
+      error: err.message
+    });
+
   }
+
 });
 
-// SPECIFIC ROUTE - Must come BEFORE /:id
-// Get family by family_number
+
+
+// ✅ GET UNIQUE BLOCKS
+router.get("/blocks/list", async (req, res) => {
+
+  try {
+
+    const blocks = await Family.distinct("ward_number");
+
+    const filtered = blocks.filter(
+      block => block && block.trim() !== ""
+    );
+
+    res.json(filtered);
+
+  } catch (err) {
+
+    res.status(500).json({
+      error: err.message
+    });
+
+  }
+
+});
+
+
+
+// ✅ GET UNIQUE UNITS
+router.get("/units/list", async (req, res) => {
+
+  try {
+
+    const units = await Family.distinct("family_unit");
+
+    const filtered = units.filter(
+      unit => unit && unit.trim() !== ""
+    );
+
+    res.json(filtered);
+
+  } catch (err) {
+
+    res.status(500).json({
+      error: err.message
+    });
+
+  }
+
+});
+
+
+
+// ✅ GET FAMILY BY FAMILY NUMBER
 router.get("/number/:family_number", async (req, res) => {
+
   try {
-    const family = await Family.findOne({ family_number: req.params.family_number }).lean();
-    if (!family) return res.status(404).json({ error: "Family not found" });
+
+    const family = await Family.findOne({
+      family_number: req.params.family_number
+    }).lean();
+
+    if (!family) {
+
+      return res.status(404).json({
+        error: "Family not found"
+      });
+
+    }
+
     res.json(family);
+
   } catch (err) {
-    res.status(500).json({ error: err.message });
+
+    res.status(500).json({
+      error: err.message
+    });
+
   }
+
 });
 
-// GENERIC /:id ROUTES - Must be LAST
 
-// Get single family
+
+// ✅ GET FAMILY BY ID
 router.get("/:id", async (req, res) => {
+
   try {
+
     const family = await Family.findById(req.params.id).lean();
-    if (!family) return res.status(404).json({ error: "Family not found" });
+
+    if (!family) {
+
+      return res.status(404).json({
+        error: "Family not found"
+      });
+
+    }
+
     res.json(family);
+
   } catch (err) {
-    res.status(500).json({ error: err.message });
+
+    res.status(500).json({
+      error: err.message
+    });
+
   }
+
 });
 
-// Update family
+
+
+// ✅ UPDATE FAMILY
 router.put("/:id", async (req, res) => {
+
   try {
-    const updatedFamily = await Family.findByIdAndUpdate(
+
+    const updated = await Family.findByIdAndUpdate(
       req.params.id,
       req.body,
-      { new: true, runValidators: true }
+      {
+        new: true,
+        runValidators: true
+      }
     );
-    if (!updatedFamily) return res.status(404).json({ error: "Family not found" });
-    res.json({ message: "Family updated successfully", updatedFamily });
+
+    if (!updated) {
+
+      return res.status(404).json({
+        error: "Family not found"
+      });
+
+    }
+
+    res.json({
+      message: "Family updated successfully",
+      updatedFamily: updated
+    });
+
   } catch (err) {
-    res.status(400).json({ error: err.message });
+
+    res.status(400).json({
+      error: err.message
+    });
+
   }
+
 });
 
-// Delete family
+
+
+// ✅ DELETE FAMILY
 router.delete("/:id", async (req, res) => {
+
   try {
-    const deleted = await Family.findByIdAndDelete(req.params.id);
-    if (!deleted) return res.status(404).json({ error: "Family not found" });
-    res.json({ message: "Family deleted successfully" });
+
+    const deleted = await Family.findByIdAndDelete(
+      req.params.id
+    );
+
+    if (!deleted) {
+
+      return res.status(404).json({
+        error: "Family not found"
+      });
+
+    }
+
+    res.json({
+      message: "Family deleted successfully"
+    });
+
   } catch (err) {
-    res.status(500).json({ error: err.message });
+
+    res.status(500).json({
+      error: err.message
+    });
+
   }
+
 });
+
 
 export default router;

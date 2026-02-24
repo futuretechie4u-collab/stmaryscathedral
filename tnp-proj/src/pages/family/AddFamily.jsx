@@ -1,53 +1,105 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import "../../css/addfamily.css";
+import "../../css/AddFamily.css";
+
 const AddFamily = () => {
 
   const navigate = useNavigate();
 
+  // ✅ Ward → Unit structure
+  const wardStructure = {
+
+    "Block 1": [
+      { number: "1", name: "Morth Smuni" },
+      { number: "2", name: "Mar Athanasious" },
+      { number: "3", name: "St. Philips" }
+    ],
+
+    "Block 2": [
+      { number: "1", name: "Mar Basil" },
+      { number: "2", name: "Mar Gabriel" },
+      { number: "3", name: "St. Joseph" },
+      { number: "4", name: "St. Andrews" },
+      { number: "5", name: "Mar Gregorious" },
+      { number: "6", name: "St. Thomas" }
+    ],
+
+    "Block 3": [
+      { number: "1", name: "St. Paul" },
+      { number: "2", name: "Mar Aprem" },
+      { number: "3", name: "St. James" }
+    ],
+
+    "Block 4": [
+      { number: "1", name: "St. Johns" },
+      { number: "2", name: "Mar Micheal" },
+      { number: "3", name: "Mar Bahanam" }
+    ],
+
+    "Block 5": [
+      { number: "1", name: "St. George" },
+      { number: "2", name: "Morth Uluthy" },
+      { number: "3", name: "Mar Kauma" },
+      { number: "4", name: "Mar Alias" },
+      { number: "5", name: "Mar Ignatious" },
+      { number: "6", name: "St. Peters" }
+    ],
+
+    "Block 6": [
+      { number: "1", name: "Mar Severios" },
+      { number: "2", name: "Mar Yacob Burdhana" },
+      { number: "3", name: "Mar Semavoon" },
+      { number: "4", name: "Mar Ahathulla" },
+      { number: "5", name: "St. Mathews" },
+      { number: "6", name: "Mar Julius" }
+    ]
+
+  };
+
+
+  // ✅ Full form state restored
   const [form, setForm] = useState({
+
+    ward_number: "",
+    family_unit: "",
     family_number: "",
     name: "",
     hof: "",
     count: "",
     location: "",
     village: "",
-    contact_number: "",
-    family_unit: "",
-    ward_number: ""
+    contact_number: ""
+
   });
 
-  const [blocks, setBlocks] = useState([]);
-  const [units, setUnits] = useState([]);
 
-  // FETCH BLOCKS
-  useEffect(() => {
-    axios.get("https://stmaryscathedral.onrender.com/api/families/blocks/list")
-      .then(res => {
-        console.log("Blocks:", res.data);
-        setBlocks(res.data);
-      })
-      .catch(err => console.error(err));
-  }, []);
-
-  // FETCH UNITS
-  useEffect(() => {
-    axios.get("https://stmaryscathedral.onrender.com/api/families/units/list")
-      .then(res => {
-        console.log("Units:", res.data);
-        setUnits(res.data);
-      })
-      .catch(err => console.error(err));
-  }, []);
-
+  // ✅ Handle change
   const handleChange = (e) => {
-    setForm({
-      ...form,
-      [e.target.name]: e.target.value
-    });
+
+    const { name, value } = e.target;
+
+    if (name === "ward_number") {
+
+      setForm({
+        ...form,
+        ward_number: value,
+        family_unit: ""
+      });
+
+    } else {
+
+      setForm({
+        ...form,
+        [name]: value
+      });
+
+    }
+
   };
 
+
+  // ✅ Submit
   const handleSubmit = async (e) => {
 
     e.preventDefault();
@@ -69,56 +121,92 @@ const AddFamily = () => {
 
     } catch (err) {
 
-      alert(err.response?.data?.error || err.message);
+      alert(
+        err.response?.data?.error ||
+        err.message
+      );
 
     }
+
   };
 
+
+  // Units based on selected block
+  const availableUnits =
+    wardStructure[form.ward_number] || [];
+
+
   return (
+
     <div className="container">
 
-      <form className="register-form" onSubmit={handleSubmit}>
+      <form
+        className="register-form"
+        onSubmit={handleSubmit}
+      >
 
-        {/* BLOCK DROPDOWN */}
+
+        {/* BLOCK */}
         <div className="input-group">
+
           <select
             name="ward_number"
             value={form.ward_number}
             onChange={handleChange}
             required
           >
-            <option value="">Select Block Number</option>
 
-            {blocks.map((block, index) => (
-              <option key={index} value={block}>
+            <option value="">
+              Select Block
+            </option>
+
+            {Object.keys(wardStructure).map(block => (
+
+              <option key={block} value={block}>
                 {block}
               </option>
+
             ))}
 
           </select>
+
           <label>Block Number</label>
+
         </div>
 
 
-        {/* UNIT DROPDOWN */}
+
+        {/* UNIT */}
         <div className="input-group">
+
           <select
             name="family_unit"
             value={form.family_unit}
             onChange={handleChange}
             required
           >
-            <option value="">Select Unit Number</option>
 
-            {units.map((unit, index) => (
-              <option key={index} value={unit}>
-                {unit}
+            <option value="">
+              Select Unit
+            </option>
+
+            {availableUnits.map(unit => (
+
+              <option
+                key={unit.number}
+                value={unit.number}
+              >
+                Unit {unit.number} — {unit.name}
               </option>
+
             ))}
 
           </select>
+
           <label>Unit Number</label>
+
         </div>
+
 
 
         {/* FAMILY NUMBER */}
@@ -134,6 +222,7 @@ const AddFamily = () => {
         </div>
 
 
+
         {/* FAMILY NAME */}
         <div className="input-group">
           <input
@@ -145,6 +234,7 @@ const AddFamily = () => {
           />
           <label>Family Name</label>
         </div>
+
 
 
         {/* HEAD OF FAMILY */}
@@ -160,6 +250,7 @@ const AddFamily = () => {
         </div>
 
 
+
         {/* MEMBER COUNT */}
         <div className="input-group">
           <input
@@ -170,6 +261,7 @@ const AddFamily = () => {
           />
           <label>Member Count</label>
         </div>
+
 
 
         {/* LOCATION */}
@@ -184,6 +276,7 @@ const AddFamily = () => {
         </div>
 
 
+
         {/* VILLAGE */}
         <div className="input-group">
           <input
@@ -194,6 +287,7 @@ const AddFamily = () => {
           />
           <label>Village</label>
         </div>
+
 
 
         {/* CONTACT NUMBER */}
@@ -208,26 +302,21 @@ const AddFamily = () => {
         </div>
 
 
-        {/* FAMILY UNIT NAME TEXT FIELD (optional separate field) */}
-        <div className="input-group">
-          <input
-            type="text"
-            name="family_unit_name"
-            value={form.family_unit_name || ""}
-            onChange={handleChange}
-          />
-          <label>Kudumb Unit Name</label>
-        </div>
 
-
-        <button type="submit" className="submit-btn">
+        <button
+          type="submit"
+          className="submit-btn"
+        >
           Submit
         </button>
+
 
       </form>
 
     </div>
+
   );
+
 };
 
 export default AddFamily;

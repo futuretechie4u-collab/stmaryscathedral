@@ -92,10 +92,10 @@ const ViewMarriage = () => {
       date: marriage.date ? marriage.date.split("T")[0] : "",
       place: marriage.place || "",
       officiant_number: marriage.officiant_number || "",
-      spouse1: marriage.spouse1_name || "",
-      spouse2: marriage.spouse2_name || "",
-      isGroomParishioner: marriage.spouse1_isParishioner !== false,
-      isBrideParishioner: marriage.spouse2_isParishioner !== false,
+      spouse1_name: marriage.spouse1_name || "",
+      spouse2_name: marriage.spouse2_name || "",
+      spouse1_isParishioner: marriage.spouse1_isParishioner !== false,
+      spouse2_isParishioner: marriage.spouse2_isParishioner !== false,
       remarks: marriage.remarks || "",
     });
     setEditMode(true);
@@ -331,14 +331,14 @@ const ViewMarriage = () => {
                   <div className="modal-grid">
                     <div className="modal-field">
                       <label>Groom Name</label>
-                      <input name="spouse1" value={editData.spouse1} onChange={handleEditChange} />
+                      <input name="spouse1_name" value={editData.spouse1_name} onChange={handleEditChange} />
                     </div>
                     <div className="modal-field">
                       <label>Groom Status</label>
                       <select
-                        name="isGroomParishioner"
-                        value={editData.isGroomParishioner}
-                        onChange={(e) => setEditData((p) => ({ ...p, isGroomParishioner: e.target.value === "true" }))}
+                        name="spouse1_isParishioner"
+                        value={editData.spouse1_isParishioner}
+                        onChange={(e) => setEditData((p) => ({ ...p, spouse1_isParishioner: e.target.value === "true" }))}
                       >
                         <option value="true">Parishioner</option>
                         <option value="false">Non-Parishioner</option>
@@ -346,14 +346,14 @@ const ViewMarriage = () => {
                     </div>
                     <div className="modal-field">
                       <label>Bride Name</label>
-                      <input name="spouse2" value={editData.spouse2} onChange={handleEditChange} />
+                      <input name="spouse2_name" value={editData.spouse2_name} onChange={handleEditChange} />
                     </div>
                     <div className="modal-field">
                       <label>Bride Status</label>
                       <select
-                        name="isBrideParishioner"
-                        value={editData.isBrideParishioner}
-                        onChange={(e) => setEditData((p) => ({ ...p, isBrideParishioner: e.target.value === "true" }))}
+                        name="spouse2_isParishioner"
+                        value={editData.spouse2_isParishioner}
+                        onChange={(e) => setEditData((p) => ({ ...p, spouse2_isParishioner: e.target.value === "true" }))}
                       >
                         <option value="true">Parishioner</option>
                         <option value="false">Non-Parishioner</option>

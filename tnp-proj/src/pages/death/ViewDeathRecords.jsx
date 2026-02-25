@@ -97,18 +97,23 @@ const ViewDeathRecords = () => {
   };
 
   /* SEARCH */
-  const filteredRecords = records.filter((rec) => {
+  const filteredRecords = records.filter((rec, index) => {
     if (!search.trim()) return true;
     const s = search.toLowerCase();
+    const statusText = rec.isParishioner === false ? "non-parishioner" : "parishioner";
+    const slNoText = (index + 1).toString();
+
     return (
-      (rec.name || "").toLowerCase().includes(s) ||
-      (rec.house_name || "").toLowerCase().includes(s) ||
-      (rec.family_no || "").toString().includes(s) ||
-      (rec.address_place || "").toLowerCase().includes(s) ||
-      (rec.father_husband_name || "").toLowerCase().includes(s) ||
-      (rec.mother_wife_name || "").toLowerCase().includes(s) ||
-      (rec.cause_of_death || "").toLowerCase().includes(s) ||
-      (rec.conducted_by || "").toLowerCase().includes(s)
+      rec.name?.toLowerCase().includes(s) ||
+      rec.house_name?.toLowerCase().includes(s) ||
+      rec.family_no?.toString().includes(s) ||
+      rec.address_place?.toLowerCase().includes(s) ||
+      rec.father_husband_name?.toLowerCase().includes(s) ||
+      rec.mother_wife_name?.toLowerCase().includes(s) ||
+      rec.cause_of_death?.toLowerCase().includes(s) ||
+      rec.conducted_by?.toLowerCase().includes(s) ||
+      statusText.includes(s) ||
+      slNoText.includes(s)
     );
   });
 
@@ -214,7 +219,11 @@ const ViewDeathRecords = () => {
               {filteredRecords.map((rec, index) => (
                 <tr key={rec._id}>
                   <td>{index + 1}</td>
-                  <td>{rec.isParishioner === false ? "Non-Parishioner" : "Parishioner"}</td>
+                  <td>
+                    <span className={`status-badge ${rec.isParishioner === false ? 'non-parishioner' : 'parishioner'}`}>
+                      {rec.isParishioner === false ? "Non-Parishioner" : "Parishioner"}
+                    </span>
+                  </td>
                   <td>{rec.family_no}</td>
                   <td>{rec.name}</td>
                   <td>{rec.house_name}</td>

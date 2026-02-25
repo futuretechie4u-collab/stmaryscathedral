@@ -123,6 +123,22 @@ const AddMarriage = () => {
       }
     }
 
+    if (!marriageData.date) {
+      alert("⚠️ Please select a marriage date");
+      return;
+    }
+
+    if (!marriageData.marriage_id.trim()) {
+      alert("⚠️ Please enter a Marriage ID");
+      return;
+    }
+
+    // Validate officiant_number if provided
+    if (marriageData.officiant_number && isNaN(Number(marriageData.officiant_number))) {
+      alert("⚠️ Officiant Number must be a valid number.");
+      return;
+    }
+
     // Prevent same person (only if both parishioners)
     if (
       isGroomParishioner &&

@@ -6,11 +6,11 @@ const NewBaptism = () => {
   const [familySearch, setFamilySearch] = useState('');
   const [familyResults, setFamilyResults] = useState([]);
   const [selectedFamilyName, setSelectedFamilyName] = useState('');
-  
+
   const [headsOfFamily, setHeadsOfFamily] = useState([]);
   const [selectedFamilyId, setSelectedFamilyId] = useState('');
   const [selectedFamily, setSelectedFamily] = useState(null);
-  
+
   const [unbaptizedMembers, setUnbaptizedMembers] = useState([]);
   const [selectedMemberId, setSelectedMemberId] = useState('');
   const [selectedMember, setSelectedMember] = useState(null);
@@ -67,7 +67,7 @@ const NewBaptism = () => {
     if (selectedMemberId) {
       const member = unbaptizedMembers.find(m => m._id === selectedMemberId);
       setSelectedMember(member);
-      
+
       if (member) {
         // Auto-fill form data
         setFormData(prev => ({
@@ -85,15 +85,15 @@ const NewBaptism = () => {
       setSearchLoading(true);
       console.log("Searching for:", familySearch); // Debug
       const res = await fetch(`https://stmaryscathedral.onrender.com/api/baptisms/search-families/${familySearch}`);
-      
+
       if (!res.ok) {
         console.error("Search failed:", res.status);
         return;
       }
-      
+
       const data = await res.json();
       console.log("Search results:", data); // Debug
-      
+
       // Get unique family names
       const uniqueFamilies = [...new Set(data.map(f => f.name))];
       console.log("Unique families:", uniqueFamilies); // Debug
@@ -110,7 +110,7 @@ const NewBaptism = () => {
       const res = await fetch(`https://stmaryscathedral.onrender.com/api/baptisms/heads-of-family/${selectedFamilyName}`);
       const data = await res.json();
       setHeadsOfFamily(data);
-      
+
       // Reset subsequent selections
       setSelectedFamilyId('');
       setSelectedFamily(null);
@@ -126,18 +126,18 @@ const NewBaptism = () => {
     try {
       console.log("Fetching unbaptized members for family:", familyNumber);
       const res = await fetch(`https://stmaryscathedral.onrender.com/api/baptisms/unbaptized-members/${familyNumber}`);
-      
+
       if (!res.ok) {
         console.error("Failed to fetch members:", res.status);
         return;
       }
-      
+
       const data = await res.json();
       console.log("Unbaptized members response:", data);
       console.log("Number of unbaptized members:", data.length);
-      
+
       setUnbaptizedMembers(data);
-      
+
       // Reset member selection
       setSelectedMemberId('');
       setSelectedMember(null);
@@ -162,23 +162,40 @@ const NewBaptism = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-if (isParishioner && !selectedMember) {
-  alert('Please select a member to baptize');
-  return;
-}
+
+    if (isParishioner && !selectedMember) {
+      alert('⚠️ Please select a member to baptize');
+      return;
+    }
+
+    if (!isParishioner) {
+      if (!formData.member_name?.trim() || !formData.member_dob || !formData.gender) {
+        alert('⚠️ Please complete all person details (Name, DOB, Gender)');
+        return;
+      }
+    }
+
+    if (!formData.date_of_baptism) {
+      alert('⚠️ Please select a baptism date');
+      return;
+    }
+
+    if (!formData.bapt_name?.trim()) {
+      alert('⚠️ Please enter the baptism name');
+      return;
+    }
 
     setLoading(true);
 
     try {
-const payload = {
-  isParishioner,
-  ...formData
-};
+      const payload = {
+        isParishioner,
+        ...formData
+      };
 
-if (isParishioner) {
-  payload.member_id = selectedMember._id;
-}
+      if (isParishioner) {
+        payload.member_id = selectedMember._id;
+      }
 
 
       const res = await fetch('https://stmaryscathedral.onrender.com/api/baptisms', {
@@ -194,7 +211,7 @@ if (isParishioner) {
       }
 
       alert('✅ Baptism record added successfully!');
-      
+
       // Reset form
       resetForm();
     } catch (err) {
@@ -256,208 +273,208 @@ if (isParishioner) {
       <div className="baptism-form-card">
         <form onSubmit={handleSubmit}>
           {/* Step 0: Parishioner Selection */}
-<div className="form-section">
-  <h2 className="section-title">0. Parishioner Status</h2>
-  <div className="form-group">
-    <label>
-      <input
-        type="radio"
-        checked={isParishioner}
-        onChange={() => setIsParishioner(true)}
-      /> Parishioner
-    </label>
-    &nbsp;&nbsp;&nbsp;
-    <label>
-      <input
-        type="radio"
-        checked={!isParishioner}
-        onChange={() => setIsParishioner(false)}
-      /> Non-Parishioner
-    </label>
-  </div>
-</div>
-
-{isParishioner && (
-  <>
-    {/* Step 1: Search and Select Family Name */}
-
-
-
           <div className="form-section">
-            <h2 className="section-title">1. Select Family Name</h2>
-            <div className="search-box">
-              <label>Search Family Name *</label>
-              <input
-                type="text"
-                placeholder="Type family name to search..."
-                value={familySearch}
-                onChange={(e) => setFamilySearch(e.target.value)}
-                className="form-input"
-                required
-              />
-              {searchLoading && (
-                <div className="search-loading">Searching...</div>
-              )}
-              {!searchLoading && familyResults.length > 0 && (
-                <ul className="search-results">
-                  {familyResults.map((familyName, idx) => (
-                    <li
-                      key={idx}
-                      onClick={() => handleFamilyNameSelect(familyName)}
-                      className="search-result-item"
-                    >
-                      {familyName}
-                    </li>
-                  ))}
-                </ul>
-              )}
-              {!searchLoading && familySearch.length >= 2 && familyResults.length === 0 && (
-                <div className="no-results-message">
-                  No families found with name "{familySearch}"
-                </div>
-              )}
+            <h2 className="section-title">0. Parishioner Status</h2>
+            <div className="form-group">
+              <label>
+                <input
+                  type="radio"
+                  checked={isParishioner}
+                  onChange={() => setIsParishioner(true)}
+                /> Parishioner
+              </label>
+              &nbsp;&nbsp;&nbsp;
+              <label>
+                <input
+                  type="radio"
+                  checked={!isParishioner}
+                  onChange={() => setIsParishioner(false)}
+                /> Non-Parishioner
+              </label>
             </div>
           </div>
 
-          {/* Step 2: Select Head of Family */}
-          {selectedFamilyName && headsOfFamily.length > 0 && (
-            <div className="form-section">
-              <h2 className="section-title">2. Select Head of Family</h2>
-              <div className="form-group">
-                <label>Head of Family (HOF) *</label>
-                <select
-                  value={selectedFamilyId}
-                  onChange={(e) => setSelectedFamilyId(e.target.value)}
-                  className="form-select"
-                  required
-                >
-                  <option value="">-- Select HOF --</option>
-                  {headsOfFamily.map((family) => (
-                    <option key={family._id} value={family._id}>
-                      {family.hof} - {family.family_number} {family.location ? `(${family.location})` : ''}
-                    </option>
-                  ))}
-                </select>
+          {isParishioner && (
+            <>
+              {/* Step 1: Search and Select Family Name */}
+
+
+
+              <div className="form-section">
+                <h2 className="section-title">1. Select Family Name</h2>
+                <div className="search-box">
+                  <label>Search Family Name *</label>
+                  <input
+                    type="text"
+                    placeholder="Type family name to search..."
+                    value={familySearch}
+                    onChange={(e) => setFamilySearch(e.target.value)}
+                    className="form-input"
+                    required
+                  />
+                  {searchLoading && (
+                    <div className="search-loading">Searching...</div>
+                  )}
+                  {!searchLoading && familyResults.length > 0 && (
+                    <ul className="search-results">
+                      {familyResults.map((familyName, idx) => (
+                        <li
+                          key={idx}
+                          onClick={() => handleFamilyNameSelect(familyName)}
+                          className="search-result-item"
+                        >
+                          {familyName}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                  {!searchLoading && familySearch.length >= 2 && familyResults.length === 0 && (
+                    <div className="no-results-message">
+                      No families found with name "{familySearch}"
+                    </div>
+                  )}
+                </div>
               </div>
 
-              {selectedFamily && (
-                <div className="info-box">
-                  <h3>Selected Family Details</h3>
-                  <div className="info-grid">
-                    <div><strong>Family Name:</strong> {selectedFamily.name}</div>
-                    <div><strong>Family Number:</strong> {selectedFamily.family_number}</div>
-                    <div><strong>HOF:</strong> {selectedFamily.hof}</div>
-                    <div><strong>Location:</strong> {selectedFamily.location || 'N/A'}</div>
-                    <div><strong>Contact:</strong> {selectedFamily.contact_number || 'N/A'}</div>
-                    <div><strong>Ward:</strong> {selectedFamily.ward_number || 'N/A'}</div>
+              {/* Step 2: Select Head of Family */}
+              {selectedFamilyName && headsOfFamily.length > 0 && (
+                <div className="form-section">
+                  <h2 className="section-title">2. Select Head of Family</h2>
+                  <div className="form-group">
+                    <label>Head of Family (HOF) *</label>
+                    <select
+                      value={selectedFamilyId}
+                      onChange={(e) => setSelectedFamilyId(e.target.value)}
+                      className="form-select"
+                      required
+                    >
+                      <option value="">-- Select HOF --</option>
+                      {headsOfFamily.map((family) => (
+                        <option key={family._id} value={family._id}>
+                          {family.hof} - {family.family_number} {family.location ? `(${family.location})` : ''}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {selectedFamily && (
+                    <div className="info-box">
+                      <h3>Selected Family Details</h3>
+                      <div className="info-grid">
+                        <div><strong>Family Name:</strong> {selectedFamily.name}</div>
+                        <div><strong>Family Number:</strong> {selectedFamily.family_number}</div>
+                        <div><strong>HOF:</strong> {selectedFamily.hof}</div>
+                        <div><strong>Location:</strong> {selectedFamily.location || 'N/A'}</div>
+                        <div><strong>Contact:</strong> {selectedFamily.contact_number || 'N/A'}</div>
+                        <div><strong>Ward:</strong> {selectedFamily.ward_number || 'N/A'}</div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Step 3: Select Member */}
+              {selectedFamily && unbaptizedMembers.length > 0 && (
+                <div className="form-section">
+                  <h2 className="section-title">3. Select Member to Baptize</h2>
+                  <div className="form-group">
+                    <label>Member Name *</label>
+                    <select
+                      value={selectedMemberId}
+                      onChange={(e) => setSelectedMemberId(e.target.value)}
+                      className="form-select"
+                      required
+                    >
+                      <option value="">-- Select Member --</option>
+                      {unbaptizedMembers.map((member) => (
+                        <option key={member._id} value={member._id}>
+                          {member.name} - {member.gender} - {formatDate(member.dob)} ({calculateAge(member.dob)} years)
+                          {member.relation ? ` - ${member.relation}` : ''}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {selectedMember && (
+                    <div className="info-box">
+                      <h3>Selected Member Details</h3>
+                      <div className="info-grid">
+                        <div><strong>Name:</strong> {selectedMember.name}</div>
+                        <div><strong>Gender:</strong> {selectedMember.gender}</div>
+                        <div><strong>Date of Birth:</strong> {formatDate(selectedMember.dob)}</div>
+                        <div><strong>Age:</strong> {calculateAge(selectedMember.dob)} years</div>
+                        <div><strong>Relation:</strong> {selectedMember.relation || 'N/A'}</div>
+                        <div><strong>Phone:</strong> {selectedMember.phone || 'N/A'}</div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Show message if no unbaptized members */}
+              {selectedFamily && unbaptizedMembers.length === 0 && (
+                <div className="form-section">
+                  <div className="no-members-message">
+                    ⚠️ No unbaptized members found in this family. All members are either already baptized or marked as deceased.
                   </div>
                 </div>
               )}
-            </div>
-          )}
-
-          {/* Step 3: Select Member */}
-          {selectedFamily && unbaptizedMembers.length > 0 && (
-            <div className="form-section">
-              <h2 className="section-title">3. Select Member to Baptize</h2>
-              <div className="form-group">
-                <label>Member Name *</label>
-                <select
-                  value={selectedMemberId}
-                  onChange={(e) => setSelectedMemberId(e.target.value)}
-                  className="form-select"
-                  required
-                >
-                  <option value="">-- Select Member --</option>
-                  {unbaptizedMembers.map((member) => (
-                    <option key={member._id} value={member._id}>
-                      {member.name} - {member.gender} - {formatDate(member.dob)} ({calculateAge(member.dob)} years)
-                      {member.relation ? ` - ${member.relation}` : ''}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {selectedMember && (
-                <div className="info-box">
-                  <h3>Selected Member Details</h3>
-                  <div className="info-grid">
-                    <div><strong>Name:</strong> {selectedMember.name}</div>
-                    <div><strong>Gender:</strong> {selectedMember.gender}</div>
-                    <div><strong>Date of Birth:</strong> {formatDate(selectedMember.dob)}</div>
-                    <div><strong>Age:</strong> {calculateAge(selectedMember.dob)} years</div>
-                    <div><strong>Relation:</strong> {selectedMember.relation || 'N/A'}</div>
-                    <div><strong>Phone:</strong> {selectedMember.phone || 'N/A'}</div>
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Show message if no unbaptized members */}
-          {selectedFamily && unbaptizedMembers.length === 0 && (
-            <div className="form-section">
-              <div className="no-members-message">
-                ⚠️ No unbaptized members found in this family. All members are either already baptized or marked as deceased.
-              </div>
-            </div>
-          )}
             </>
-)}
-{!isParishioner && (
-  <div className="form-section">
-    <h2 className="section-title">Person Details</h2>
+          )}
+          {!isParishioner && (
+            <div className="form-section">
+              <h2 className="section-title">Person Details</h2>
 
-    <div className="form-grid">
-      <div className="form-group">
-        <label>Name *</label>
-        <input
-          type="text"
-          name="member_name"
-          required
-          className="form-input"
-          onChange={handleChange}
-        />
-      </div>
+              <div className="form-grid">
+                <div className="form-group">
+                  <label>Name *</label>
+                  <input
+                    type="text"
+                    name="member_name"
+                    required
+                    className="form-input"
+                    onChange={handleChange}
+                  />
+                </div>
 
-      <div className="form-group">
-        <label>Date of Birth *</label>
-        <input
-          type="date"
-          name="member_dob"
-          required
-          className="form-input"
-          onChange={handleChange}
-        />
-      </div>
+                <div className="form-group">
+                  <label>Date of Birth *</label>
+                  <input
+                    type="date"
+                    name="member_dob"
+                    required
+                    className="form-input"
+                    onChange={handleChange}
+                  />
+                </div>
 
-      <div className="form-group">
-        <label>Gender *</label>
-        <select
-          name="gender"
-          required
-          className="form-select"
-          onChange={handleChange}
-        >
-          <option value="">-- Select --</option>
-          <option value="Male">Male</option>
-          <option value="Female">Female</option>
-        </select>
-      </div>
+                <div className="form-group">
+                  <label>Gender *</label>
+                  <select
+                    name="gender"
+                    required
+                    className="form-select"
+                    onChange={handleChange}
+                  >
+                    <option value="">-- Select --</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                  </select>
+                </div>
 
-      <div className="form-group">
-        <label>Home Parish *</label>
-        <input
-          type="text"
-          name="home_parish"
-          required
-          className="form-input"
-          onChange={handleChange}
-        />
-      </div>
-    </div>
-  </div>
-)}
+                <div className="form-group">
+                  <label>Home Parish *</label>
+                  <input
+                    type="text"
+                    name="home_parish"
+                    required
+                    className="form-input"
+                    onChange={handleChange}
+                  />
+                </div>
+              </div>
+            </div>
+          )}
 
 
 
@@ -466,7 +483,7 @@ if (isParishioner) {
 
             <div className="form-section">
               <h2 className="section-title">4. Enter Baptism Details</h2>
-              
+
               <div className="form-grid">
                 <div className="form-group">
                   <label>Baptism Name *</label>

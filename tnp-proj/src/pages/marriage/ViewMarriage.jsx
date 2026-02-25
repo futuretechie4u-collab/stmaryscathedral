@@ -52,8 +52,8 @@ const ViewMarriage = () => {
     let filtered = marriages;
     if (searchQuery.trim()) {
       filtered = filtered.filter((m) =>
-        m.spouse1.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        m.spouse2.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        m.spouse1_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        m.spouse2_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         m.marriage_id.toLowerCase().includes(searchQuery.toLowerCase())
       );
     }
@@ -92,10 +92,10 @@ const ViewMarriage = () => {
       date: marriage.date ? marriage.date.split("T")[0] : "",
       place: marriage.place || "",
       officiant_number: marriage.officiant_number || "",
-      spouse1: marriage.spouse1 || "",
-      spouse2: marriage.spouse2 || "",
-      isGroomParishioner: marriage.isGroomParishioner !== false,
-      isBrideParishioner: marriage.isBrideParishioner !== false,
+      spouse1: marriage.spouse1_name || "",
+      spouse2: marriage.spouse2_name || "",
+      isGroomParishioner: marriage.spouse1_isParishioner !== false,
+      isBrideParishioner: marriage.spouse2_isParishioner !== false,
       remarks: marriage.remarks || "",
     });
     setEditMode(true);
@@ -220,10 +220,10 @@ const ViewMarriage = () => {
               ];
               const rows = filteredMarriages.map((m) => ({
                 marriageId: m.marriage_id,
-                groom: m.spouse1,
-                groomStatus: m.isGroomParishioner !== false ? "Parishioner" : "Non-Parishioner",
-                bride: m.spouse2,
-                brideStatus: m.isBrideParishioner !== false ? "Parishioner" : "Non-Parishioner",
+                groom: m.spouse1_name,
+                groomStatus: m.spouse1_isParishioner !== false ? "Parishioner" : "Non-Parishioner",
+                bride: m.spouse2_name,
+                brideStatus: m.spouse2_isParishioner !== false ? "Parishioner" : "Non-Parishioner",
                 date: formatDate(m.date),
                 place: m.place || "N/A",
               }));
@@ -259,12 +259,12 @@ const ViewMarriage = () => {
                     <td>{index + 1}</td>
                     <td>{marriage.marriage_id}</td>
                     <td>
-                      {marriage.spouse1}
-                      <small>{marriage.isGroomParishioner !== false ? "Parishioner" : "Non-Parishioner"}</small>
+                      {marriage.spouse1_name}
+                      <small>{marriage.spouse1_isParishioner !== false ? "Parishioner" : "Non-Parishioner"}</small>
                     </td>
                     <td>
-                      {marriage.spouse2}
-                      <small>{marriage.isBrideParishioner !== false ? "Parishioner" : "Non-Parishioner"}</small>
+                      {marriage.spouse2_name}
+                      <small>{marriage.spouse2_isParishioner !== false ? "Parishioner" : "Non-Parishioner"}</small>
                     </td>
                     <td>{formatDate(marriage.date)}</td>
                     <td>{marriage.place || "N/A"}</td>
@@ -402,15 +402,15 @@ const ViewMarriage = () => {
                   <div className="modal-couple-grid">
                     <div className="spouse-card">
                       <h4>Groom</h4>
-                      <p><strong>Name:</strong> {selectedMarriage.spouse1}</p>
-                      <p><strong>Status:</strong> {selectedMarriage.isGroomParishioner !== false ? "Parishioner" : "Non-Parishioner"}</p>
+                      <p><strong>Name:</strong> {selectedMarriage.spouse1_name}</p>
+                      <p><strong>Status:</strong> {selectedMarriage.spouse1_isParishioner !== false ? "Parishioner" : "Non-Parishioner"}</p>
                       {selectedMarriage.spouse1_id?.phone && <p><strong>Phone:</strong> {selectedMarriage.spouse1_id.phone}</p>}
                       {selectedMarriage.spouse1_id?.family_number && <p><strong>Family:</strong> {selectedMarriage.spouse1_id.family_number}</p>}
                     </div>
                     <div className="spouse-card">
                       <h4>Bride</h4>
-                      <p><strong>Name:</strong> {selectedMarriage.spouse2}</p>
-                      <p><strong>Status:</strong> {selectedMarriage.isBrideParishioner !== false ? "Parishioner" : "Non-Parishioner"}</p>
+                      <p><strong>Name:</strong> {selectedMarriage.spouse2_name}</p>
+                      <p><strong>Status:</strong> {selectedMarriage.spouse2_isParishioner !== false ? "Parishioner" : "Non-Parishioner"}</p>
                       {selectedMarriage.spouse2_id?.phone && <p><strong>Phone:</strong> {selectedMarriage.spouse2_id.phone}</p>}
                       {selectedMarriage.spouse2_id?.family_number && <p><strong>Family:</strong> {selectedMarriage.spouse2_id.family_number}</p>}
                     </div>

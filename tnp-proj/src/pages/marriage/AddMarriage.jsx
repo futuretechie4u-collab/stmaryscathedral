@@ -10,12 +10,14 @@ const AddMarriage = () => {
   const [selectedGroom, setSelectedGroom] = useState(null);
   const [selectedBride, setSelectedBride] = useState(null);
   const [isGroomParishioner, setIsGroomParishioner] = useState(true);
-const [isBrideParishioner, setIsBrideParishioner] = useState(true);
+  const [isBrideParishioner, setIsBrideParishioner] = useState(true);
 
-const [manualGroomName, setManualGroomName] = useState("");
-const [manualBrideName, setManualBrideName] = useState("");
+  const [manualGroomName, setManualGroomName] = useState("");
+  const [manualBrideName, setManualBrideName] = useState("");
+  const [manualGroomHomeParish, setManualGroomHomeParish] = useState("");
+  const [manualBrideHomeParish, setManualBrideHomeParish] = useState("");
 
-  
+
   const [marriageData, setMarriageData] = useState({
     marriage_id: "",
     date: "",
@@ -41,8 +43,8 @@ const [manualBrideName, setManualBrideName] = useState("");
       setFilteredGrooms([]);
     } else {
       const males = allMembers.filter(
-        (m) => 
-          m.gender?.toLowerCase() === "male" && 
+        (m) =>
+          m.gender?.toLowerCase() === "male" &&
           m.name.toLowerCase().includes(groomSearch.toLowerCase())
       );
       setFilteredGrooms(males.slice(0, 10)); // Limit to 10 results
@@ -55,8 +57,8 @@ const [manualBrideName, setManualBrideName] = useState("");
       setFilteredBrides([]);
     } else {
       const females = allMembers.filter(
-        (m) => 
-          m.gender?.toLowerCase() === "female" && 
+        (m) =>
+          m.gender?.toLowerCase() === "female" &&
           m.name.toLowerCase().includes(brideSearch.toLowerCase())
       );
       setFilteredBrides(females.slice(0, 10)); // Limit to 10 results
@@ -93,322 +95,370 @@ const [manualBrideName, setManualBrideName] = useState("");
 
   // Handle form submission
   const handleSubmit = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  // ===== Groom validation =====
-  if (isGroomParishioner) {
-    if (!selectedGroom) {
-      alert("⚠️ Please select a groom");
-      return;
-    }
-  } else {
-    if (!manualGroomName.trim()) {
-      alert("⚠️ Please enter groom name");
-      return;
-    }
-  }
-
-  // ===== Bride validation =====
-  if (isBrideParishioner) {
-    if (!selectedBride) {
-      alert("⚠️ Please select a bride");
-      return;
-    }
-  } else {
-    if (!manualBrideName.trim()) {
-      alert("⚠️ Please enter bride name");
-      return;
-    }
-  }
-
-  // Prevent same person (only if both parishioners)
-  if (
-    isGroomParishioner &&
-    isBrideParishioner &&
-    selectedGroom._id === selectedBride._id
-  ) {
-    alert("⚠️ Groom and Bride cannot be the same person");
-    return;
-  }
-
-const payload = {
-  marriage_id: marriageData.marriage_id,
-
-  spouse1_id: isGroomParishioner ? selectedGroom?._id : null,
-  spouse1_name: isGroomParishioner ? selectedGroom?.name : manualGroomName,
-  spouse1_isParishioner: isGroomParishioner,
-
-  spouse2_id: isBrideParishioner ? selectedBride?._id : null,
-  spouse2_name: isBrideParishioner ? selectedBride?.name : manualBrideName,
-  spouse2_isParishioner: isBrideParishioner,
-
-  date: marriageData.date,
-  place: marriageData.place,
-  officiant_number: marriageData.officiant_number
-};
-
-
-  try {
-    const res = await fetch(
-      "https://stmaryscathedral.onrender.com/api/marriages",
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
+    // ===== Groom validation =====
+    if (isGroomParishioner) {
+      if (!selectedGroom) {
+        alert("⚠️ Please select a groom");
+        return;
       }
-    );
-
-    const data = await res.json();
-
-    if (!res.ok) {
-      throw new Error(data.error || "Failed to add marriage record");
+    } else {
+      if (!manualGroomName.trim()) {
+        alert("⚠️ Please enter groom name");
+        return;
+      }
     }
 
-    alert("✅ Marriage record added successfully!");
+    // ===== Bride validation =====
+    if (isBrideParishioner) {
+      if (!selectedBride) {
+        alert("⚠️ Please select a bride");
+        return;
+      }
+    } else {
+      if (!manualBrideName.trim()) {
+        alert("⚠️ Please enter bride name");
+        return;
+      }
+    }
 
-    // Reset
-    setGroomSearch("");
-    setBrideSearch("");
-    setSelectedGroom(null);
-    setSelectedBride(null);
-    setManualGroomName("");
-    setManualBrideName("");
-    setFilteredGrooms([]);
-    setFilteredBrides([]);
-    setMarriageData({
-      marriage_id: "",
-      date: "",
-      place: "",
-      officiant_number: "",
-    });
-  } catch (err) {
-    console.error(err);
-    alert(`❌ Error: ${err.message}`);
-  }
-};
+    // Prevent same person (only if both parishioners)
+    if (
+      isGroomParishioner &&
+      isBrideParishioner &&
+      selectedGroom._id === selectedBride._id
+    ) {
+      alert("⚠️ Groom and Bride cannot be the same person");
+      return;
+    }
+
+    const payload = {
+      marriage_id: marriageData.marriage_id,
+
+      spouse1_id: isGroomParishioner ? selectedGroom?._id : null,
+      spouse1_name: isGroomParishioner ? selectedGroom?.name : manualGroomName,
+      spouse1_isParishioner: isGroomParishioner,
+      spouse1_home_parish: isGroomParishioner ? null : manualGroomHomeParish,
+
+      spouse2_id: isBrideParishioner ? selectedBride?._id : null,
+      spouse2_name: isBrideParishioner ? selectedBride?.name : manualBrideName,
+      spouse2_isParishioner: isBrideParishioner,
+      spouse2_home_parish: isBrideParishioner ? null : manualBrideHomeParish,
+
+      date: marriageData.date,
+      place: marriageData.place,
+      officiant_number: marriageData.officiant_number
+    };
+
+
+    try {
+      const res = await fetch(
+        "https://stmaryscathedral.onrender.com/api/marriages",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        }
+      );
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to add marriage record");
+      }
+
+      alert("✅ Marriage record added successfully!");
+
+      // Reset
+      setGroomSearch("");
+      setBrideSearch("");
+      setSelectedGroom(null);
+      setSelectedBride(null);
+      setManualGroomName("");
+      setManualBrideName("");
+      setManualGroomHomeParish("");
+      setManualBrideHomeParish("");
+      setFilteredGrooms([]);
+      setFilteredBrides([]);
+      setMarriageData({
+        marriage_id: "",
+        date: "",
+        place: "",
+        officiant_number: "",
+      });
+    } catch (err) {
+      console.error(err);
+      alert(`❌ Error: ${err.message}`);
+    }
+  };
 
   return (
     <>
- <div className="marriage-flex-container">
+      <div className="marriage-flex-container">
 
-  {/* ================= GROOM SECTION ================= */}
-  <div className="marriage-card">
-    <h2 className="marriage-title">Search Groom</h2>
+        {/* ================= GROOM SECTION ================= */}
+        <div className="marriage-card">
+          <h2 className="marriage-title">Search Groom</h2>
 
-    <label style={{ marginBottom: "10px", display: "block" }}>
-      <input
-        type="checkbox"
-        checked={isGroomParishioner}
-        onChange={() => {
-          setIsGroomParishioner(!isGroomParishioner);
-          setSelectedGroom(null);
-          setGroomSearch("");
-          setManualGroomName("");
-        }}
-      />{" "}
-      Parishioner
-    </label>
-
-    {isGroomParishioner ? (
-      <>
-        <div className="marriage-input-wrapper">
-          <input
-            type="text"
-            placeholder="SEARCH GROOM"
-            value={groomSearch}
-            onChange={(e) => setGroomSearch(e.target.value)}
-            className="marriage-input"
-          />
-        </div>
-
-        {selectedGroom && (
-          <div className="marriage-selected-info">
-            <strong>Selected: {selectedGroom.name}</strong>
-            <button
-              type="button"
-              onClick={() => setSelectedGroom(null)}
-              className="marriage-clear-btn"
-            >
-              Clear
-            </button>
+          <div className="parishioner-toggle-group">
+            <label>
+              <input
+                type="radio"
+                name="groomParishioner"
+                checked={isGroomParishioner}
+                onChange={() => {
+                  setIsGroomParishioner(true);
+                  setSelectedGroom(null);
+                  setGroomSearch("");
+                  setManualGroomName("");
+                }}
+              /> Parishioner
+            </label>
+            <label>
+              <input
+                type="radio"
+                name="groomParishioner"
+                checked={!isGroomParishioner}
+                onChange={() => {
+                  setIsGroomParishioner(false);
+                  setSelectedGroom(null);
+                  setGroomSearch("");
+                  setManualGroomName("");
+                }}
+              /> Non-Parishioner
+            </label>
           </div>
-        )}
 
-        <div className="marriage-table-container">
-          <table className="marriage-table">
-            <thead>
-              <tr>
-                <th>SL NO</th>
-                <th>Name</th>
-                <th>Age</th>
-                <th>Relation</th>
-                <th>DOB</th>
-                <th>Phone</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredGrooms.length > 0 ? (
-                filteredGrooms.map((member, index) => (
-                  <tr key={member._id}>
-                    <td>{index + 1}</td>
-                    <td>{member.name}</td>
-                    <td>{calculateAge(member.dob)}</td>
-                    <td>{member.relation || "N/A"}</td>
-                    <td>{formatDate(member.dob)}</td>
-                    <td>{member.phone || "N/A"}</td>
-                    <td>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setSelectedGroom(member);
-                          setGroomSearch("");
-                          setFilteredGrooms([]);
-                        }}
-                        className="marriage-select-btn"
-                      >
-                        Select
-                      </button>
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan="7" className="marriage-no-data">
-                    {groomSearch ? "No male members found" : "Search for groom"}
-                  </td>
-                </tr>
+          {isGroomParishioner ? (
+            <>
+              <div className="marriage-input-wrapper">
+                <input
+                  type="text"
+                  placeholder="SEARCH GROOM"
+                  value={groomSearch}
+                  onChange={(e) => setGroomSearch(e.target.value)}
+                  className="marriage-input"
+                />
+              </div>
+
+              {selectedGroom && (
+                <div className="marriage-selected-info">
+                  <strong>Selected: {selectedGroom.name}</strong>
+                  <button
+                    type="button"
+                    onClick={() => setSelectedGroom(null)}
+                    className="marriage-clear-btn"
+                  >
+                    Clear
+                  </button>
+                </div>
               )}
-            </tbody>
-          </table>
+
+              <div className="marriage-table-container">
+                <table className="marriage-table">
+                  <thead>
+                    <tr>
+                      <th>SL NO</th>
+                      <th>Name</th>
+                      <th>Age</th>
+                      <th>Relation</th>
+                      <th>DOB</th>
+                      <th>Phone</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredGrooms.length > 0 ? (
+                      filteredGrooms.map((member, index) => (
+                        <tr key={member._id}>
+                          <td>{index + 1}</td>
+                          <td>{member.name}</td>
+                          <td>{calculateAge(member.dob)}</td>
+                          <td>{member.relation || "N/A"}</td>
+                          <td>{formatDate(member.dob)}</td>
+                          <td>{member.phone || "N/A"}</td>
+                          <td>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setSelectedGroom(member);
+                                setGroomSearch("");
+                                setFilteredGrooms([]);
+                              }}
+                              className="marriage-select-btn"
+                            >
+                              Select
+                            </button>
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan="7" className="marriage-no-data">
+                          {groomSearch ? "No male members found" : "Search for groom"}
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </>
+          ) : (
+            <div className="marriage-input-group-manual">
+              <input
+                type="text"
+                placeholder="GROOM NAME *"
+                value={manualGroomName}
+                onChange={(e) => setManualGroomName(e.target.value)}
+                className="marriage-input-field"
+              />
+              <input
+                type="text"
+                placeholder="HOME PARISH"
+                value={manualGroomHomeParish}
+                onChange={(e) => setManualGroomHomeParish(e.target.value)}
+                className="marriage-input-field"
+              />
+            </div>
+          )}
         </div>
-      </>
-    ) : (
-      <div className="marriage-input-wrapper">
-        <input
-          type="text"
-          placeholder="GROOM NAME"
-          value={manualGroomName}
-          onChange={(e) => setManualGroomName(e.target.value)}
-          className="marriage-input"
-        />
-      </div>
-    )}
-  </div>
 
-  {/* ================= BRIDE SECTION ================= */}
-  <div className="marriage-card">
-    <h2 className="marriage-title">Search Bride</h2>
+        {/* ================= BRIDE SECTION ================= */}
+        <div className="marriage-card">
+          <h2 className="marriage-title">Search Bride</h2>
 
-    <label style={{ marginBottom: "10px", display: "block" }}>
-      <input
-        type="checkbox"
-        checked={isBrideParishioner}
-        onChange={() => {
-          setIsBrideParishioner(!isBrideParishioner);
-          setSelectedBride(null);
-          setBrideSearch("");
-          setManualBrideName("");
-        }}
-      />{" "}
-      Parishioner
-    </label>
-
-    {isBrideParishioner ? (
-      <>
-        <div className="marriage-input-wrapper">
-          <input
-            type="text"
-            placeholder="SEARCH BRIDE"
-            value={brideSearch}
-            onChange={(e) => setBrideSearch(e.target.value)}
-            className="marriage-input"
-          />
-        </div>
-
-        {selectedBride && (
-          <div className="marriage-selected-info">
-            <strong>Selected: {selectedBride.name}</strong>
-            <button
-              type="button"
-              onClick={() => setSelectedBride(null)}
-              className="marriage-clear-btn"
-            >
-              Clear
-            </button>
+          <div className="parishioner-toggle-group">
+            <label>
+              <input
+                type="radio"
+                name="brideParishioner"
+                checked={isBrideParishioner}
+                onChange={() => {
+                  setIsBrideParishioner(true);
+                  setSelectedBride(null);
+                  setBrideSearch("");
+                  setManualBrideName("");
+                }}
+              /> Parishioner
+            </label>
+            <label>
+              <input
+                type="radio"
+                name="brideParishioner"
+                checked={!isBrideParishioner}
+                onChange={() => {
+                  setIsBrideParishioner(false);
+                  setSelectedBride(null);
+                  setBrideSearch("");
+                  setManualBrideName("");
+                }}
+              /> Non-Parishioner
+            </label>
           </div>
-        )}
 
-        <div className="marriage-table-container">
-          <table className="marriage-table">
-            <thead>
-              <tr>
-                <th>SL NO</th>
-                <th>Name</th>
-                <th>Age</th>
-                <th>Relation</th>
-                <th>DOB</th>
-                <th>Phone</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredBrides.length > 0 ? (
-                filteredBrides.map((member, index) => (
-                  <tr key={member._id}>
-                    <td>{index + 1}</td>
-                    <td>{member.name}</td>
-                    <td>{calculateAge(member.dob)}</td>
-                    <td>{member.relation || "N/A"}</td>
-                    <td>{formatDate(member.dob)}</td>
-                    <td>{member.phone || "N/A"}</td>
-                    <td>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setSelectedBride(member);
-                          setBrideSearch("");
-                          setFilteredBrides([]);
-                        }}
-                        className="marriage-select-btn"
-                      >
-                        Select
-                      </button>
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan="7" className="marriage-no-data">
-                    {brideSearch ? "No female members found" : "Search for bride"}
-                  </td>
-                </tr>
+          {isBrideParishioner ? (
+            <>
+              <div className="marriage-input-wrapper">
+                <input
+                  type="text"
+                  placeholder="SEARCH BRIDE"
+                  value={brideSearch}
+                  onChange={(e) => setBrideSearch(e.target.value)}
+                  className="marriage-input"
+                />
+              </div>
+
+              {selectedBride && (
+                <div className="marriage-selected-info">
+                  <strong>Selected: {selectedBride.name}</strong>
+                  <button
+                    type="button"
+                    onClick={() => setSelectedBride(null)}
+                    className="marriage-clear-btn"
+                  >
+                    Clear
+                  </button>
+                </div>
               )}
-            </tbody>
-          </table>
-        </div>
-      </>
-    ) : (
-      <div className="marriage-input-wrapper">
-        <input
-          type="text"
-          placeholder="BRIDE NAME"
-          value={manualBrideName}
-          onChange={(e) => setManualBrideName(e.target.value)}
-          className="marriage-input"
-        />
-      </div>
-    )}
-  </div>
 
-</div>
+              <div className="marriage-table-container">
+                <table className="marriage-table">
+                  <thead>
+                    <tr>
+                      <th>SL NO</th>
+                      <th>Name</th>
+                      <th>Age</th>
+                      <th>Relation</th>
+                      <th>DOB</th>
+                      <th>Phone</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredBrides.length > 0 ? (
+                      filteredBrides.map((member, index) => (
+                        <tr key={member._id}>
+                          <td>{index + 1}</td>
+                          <td>{member.name}</td>
+                          <td>{calculateAge(member.dob)}</td>
+                          <td>{member.relation || "N/A"}</td>
+                          <td>{formatDate(member.dob)}</td>
+                          <td>{member.phone || "N/A"}</td>
+                          <td>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setSelectedBride(member);
+                                setBrideSearch("");
+                                setFilteredBrides([]);
+                              }}
+                              className="marriage-select-btn"
+                            >
+                              Select
+                            </button>
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan="7" className="marriage-no-data">
+                          {brideSearch ? "No female members found" : "Search for bride"}
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </>
+          ) : (
+            <div className="marriage-input-group-manual">
+              <input
+                type="text"
+                placeholder="BRIDE NAME *"
+                value={manualBrideName}
+                onChange={(e) => setManualBrideName(e.target.value)}
+                className="marriage-input-field"
+              />
+              <input
+                type="text"
+                placeholder="HOME PARISH"
+                value={manualBrideHomeParish}
+                onChange={(e) => setManualBrideHomeParish(e.target.value)}
+                className="marriage-input-field"
+              />
+            </div>
+          )}
+        </div>
+
+      </div>
 
 
       {/* Marriage Details Form */}
       <div className="marriage-form-container">
         <form onSubmit={handleSubmit} className="marriage-form">
           <h2 className="marriage-form-title">Marriage Details</h2>
-          
+
           <div className="marriage-form-grid">
             <div className="marriage-input-group">
               <label>Marriage ID *</label>
@@ -455,23 +505,23 @@ const payload = {
               />
             </div>
           </div>
-<div className="marriage-summary">
-  <h3>Selected Couple:</h3>
-  <div className="marriage-couple-info">
-    <div>
-      <strong>Groom:</strong>{" "}
-      {isGroomParishioner
-        ? selectedGroom?.name || "Not selected"
-        : manualGroomName || "Not selected"}
-    </div>
-    <div>
-      <strong>Bride:</strong>{" "}
-      {isBrideParishioner
-        ? selectedBride?.name || "Not selected"
-        : manualBrideName || "Not selected"}
-    </div>
-  </div>
-</div>
+          <div className="marriage-summary">
+            <h3>Selected Couple:</h3>
+            <div className="marriage-couple-info">
+              <div>
+                <strong>Groom:</strong>{" "}
+                {isGroomParishioner
+                  ? selectedGroom?.name || "Not selected"
+                  : manualGroomName || "Not selected"}
+              </div>
+              <div>
+                <strong>Bride:</strong>{" "}
+                {isBrideParishioner
+                  ? selectedBride?.name || "Not selected"
+                  : manualBrideName || "Not selected"}
+              </div>
+            </div>
+          </div>
 
 
           <button type="submit" className="marriage-submit-btn">

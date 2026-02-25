@@ -510,7 +510,7 @@ export function generateMarriageCertificatePdf(record) {
 
   y += drawFieldRow(doc, {
     label: "Groom:",
-    value: record.spouse1,
+    value: record.spouse1_name,
     y,
     labelX,
     valueX,
@@ -521,7 +521,7 @@ export function generateMarriageCertificatePdf(record) {
 
   y += drawFieldRow(doc, {
     label: "Bride:",
-    value: record.spouse2,
+    value: record.spouse2_name,
     y,
     labelX,
     valueX,

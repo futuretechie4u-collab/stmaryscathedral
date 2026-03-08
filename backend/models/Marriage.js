@@ -44,10 +44,6 @@ const marriageSchema = new mongoose.Schema({
   spouse2_home_parish: {
     type: String
   },
-
-  // -------------------
-  // Marriage Details
-  // -------------------
   date: {
     type: Date,
     required: true

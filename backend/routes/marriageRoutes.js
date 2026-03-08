@@ -148,11 +148,11 @@ router.get("/search/:name", async (req, res) => {
     const searchName = req.params.name;
     const marriages = await Marriage.find({
       $or: [
-        { spouse1: { $regex: searchName, $options: 'i' } },
-        { spouse2: { $regex: searchName, $options: 'i' } }
+        { spouse1_name: { $regex: searchName, $options: 'i' } },
+        { spouse2_name: { $regex: searchName, $options: 'i' } }
       ]
     }).sort({ date: -1 });
-    
+
     res.json(marriages);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -169,7 +169,7 @@ router.get("/date-range", async (req, res) => {
         $lte: new Date(endDate)
       }
     }).sort({ date: -1 });
-    
+
     res.json(marriages);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -182,14 +182,14 @@ router.get("/year/:year", async (req, res) => {
     const year = parseInt(req.params.year);
     const startDate = new Date(year, 0, 1);
     const endDate = new Date(year, 11, 31, 23, 59, 59);
-    
+
     const marriages = await Marriage.find({
       date: {
         $gte: startDate,
         $lte: endDate
       }
     }).sort({ date: -1 });
-    
+
     res.json(marriages);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -201,14 +201,14 @@ router.get("/stats/overview", async (req, res) => {
   try {
     const totalMarriages = await Marriage.countDocuments();
     const currentYear = new Date().getFullYear();
-    
+
     const marriagesThisYear = await Marriage.countDocuments({
       date: {
         $gte: new Date(currentYear, 0, 1),
         $lte: new Date(currentYear, 11, 31)
       }
     });
-    
+
     const marriagesByYear = await Marriage.aggregate([
       {
         $group: {
@@ -219,7 +219,7 @@ router.get("/stats/overview", async (req, res) => {
       { $sort: { _id: -1 } },
       { $limit: 5 }
     ]);
-    
+
     res.json({
       totalMarriages,
       marriagesThisYear,
@@ -236,11 +236,11 @@ router.get("/:id", async (req, res) => {
     const marriage = await Marriage.findById(req.params.id)
       .populate('spouse1_id')
       .populate('spouse2_id');
-      
+
     if (!marriage) {
       return res.status(404).json({ error: "Marriage not found" });
     }
-    
+
     res.json(marriage);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -251,15 +251,15 @@ router.get("/:id", async (req, res) => {
 router.put("/:id", async (req, res) => {
   try {
     const updatedMarriage = await Marriage.findByIdAndUpdate(
-      req.params.id, 
-      req.body, 
+      req.params.id,
+      req.body,
       { new: true, runValidators: true }
     );
-    
+
     if (!updatedMarriage) {
       return res.status(404).json({ error: "Marriage not found" });
     }
-    
+
     res.json(updatedMarriage);
   } catch (err) {
     res.status(400).json({ error: err.message });

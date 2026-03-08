@@ -53,6 +53,8 @@ const ViewDeathRecords = () => {
       _id: rec._id,
       isParishioner: rec.isParishioner !== false,
       family_no: rec.family_no || "",
+      block: rec.block || "",
+      unit: rec.unit || "",
       name: rec.name || "",
       house_name: rec.house_name || "",
       address_place: rec.address_place || "",
@@ -151,6 +153,8 @@ const ViewDeathRecords = () => {
                 { key: "slNo", header: "Sl No" },
                 { key: "status", header: "Status" },
                 { key: "familyNo", header: "Family No" },
+                { key: "block", header: "Block" },
+                { key: "unit", header: "Unit" },
                 { key: "name", header: "Name" },
                 { key: "houseName", header: "House Name" },
                 { key: "addressPlace", header: "Address/Place" },
@@ -168,6 +172,8 @@ const ViewDeathRecords = () => {
                 slNo: index + 1,
                 status: rec.isParishioner === false ? "Non-Parishioner" : "Parishioner",
                 familyNo: rec.family_no || "-",
+                block: rec.block || "-",
+                unit: rec.unit || "-",
                 name: rec.name,
                 houseName: rec.house_name || "-",
                 addressPlace: rec.address_place || "-",
@@ -200,6 +206,8 @@ const ViewDeathRecords = () => {
                 <th>Sl No</th>
                 <th>Status</th>
                 <th>Family No</th>
+                <th>Block</th>
+                <th>Unit</th>
                 <th>Name</th>
                 <th>House Name</th>
                 <th>Address/Place</th>
@@ -225,6 +233,8 @@ const ViewDeathRecords = () => {
                     </span>
                   </td>
                   <td>{rec.family_no}</td>
+                  <td>{rec.block}</td>
+                  <td>{rec.unit}</td>
                   <td>{rec.name}</td>
                   <td>{rec.house_name}</td>
                   <td>{rec.address_place}</td>
@@ -283,6 +293,14 @@ const ViewDeathRecords = () => {
                 <div className="modal-field">
                   <label>Family No</label>
                   <input name="family_no" value={editData.family_no} onChange={handleEditChange} />
+                </div>
+                <div className="modal-field">
+                  <label>Block</label>
+                  <input name="block" value={editData.block} onChange={handleEditChange} />
+                </div>
+                <div className="modal-field">
+                  <label>Unit</label>
+                  <input name="unit" value={editData.unit} onChange={handleEditChange} />
                 </div>
                 <div className="modal-field">
                   <label>Name</label>

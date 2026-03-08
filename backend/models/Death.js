@@ -1,11 +1,6 @@
 import mongoose from "mongoose";
 
 const DeathRecordSchema = new mongoose.Schema({
-  sl_no: {
-    type: Number,
-    required: true,
-    unique: true,
-  },
 
   // 🔑 Key switch
   isParishioner: {
@@ -67,6 +62,12 @@ const DeathRecordSchema = new mongoose.Schema({
     type: String,
   },
   remarks: {
+    type: String,
+  },
+  block: {
+    type: String,
+  },
+  unit: {
     type: String,
   }
 

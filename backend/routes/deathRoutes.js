@@ -14,6 +14,10 @@ router.post("/", async (req, res) => {
       ...deathData
     } = req.body;
 
+    // Safety net: Double check that no empty strings accidentally got through
+    if (deathData.burial_date === "") deathData.burial_date = null;
+    if (deathData.age === "") deathData.age = null;
+
     // ----------------------------
     // ✅ NON-PARISHIONER FLOW
     // ----------------------------
@@ -56,6 +60,7 @@ router.post("/", async (req, res) => {
       isParishioner: true,
       member_id: memberId
     });
+    
     await newDeath.save();
 
     // Mark member deceased
@@ -108,14 +113,8 @@ router.post("/", async (req, res) => {
 
     if (err.name === "ValidationError") {
       return res.status(400).json({
-        error: "Validation error",
-        details: err.message
-      });
-    }
-
-    if (err.code === 11000) {
-      return res.status(409).json({
-        error: "A death record with this sl_no already exists."
+        error: "Validation error! A field has incorrect data.",
+        details: err.message // This passes exactly which field failed back to the alert
       });
     }
 
@@ -189,6 +188,5 @@ router.delete("/:id", async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
-
 
 export default router;

@@ -52,9 +52,9 @@ const ViewMarriage = () => {
     let filtered = marriages;
     if (searchQuery.trim()) {
       filtered = filtered.filter((m) =>
-        m.spouse1_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        m.spouse2_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        m.marriage_id.toLowerCase().includes(searchQuery.toLowerCase())
+        (m.spouse1_name || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (m.spouse2_name || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (m.marriage_id || "").toLowerCase().includes(searchQuery.toLowerCase())
       );
     }
     if (filterYear) {

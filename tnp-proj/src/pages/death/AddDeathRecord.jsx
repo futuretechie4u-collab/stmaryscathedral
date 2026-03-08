@@ -14,11 +14,54 @@ const AddDeathRecord = () => {
   const [isParishioner, setIsParishioner] = useState(true);
 
 
+  const blockUnits = {
+    1: [
+      { number: 1, name: "Morth Smuni" },
+      { number: 2, name: "Mar Athanasious" },
+      { number: 3, name: "St. Philips" }
+    ],
+    2: [
+      { number: 1, name: "Mar Basil" },
+      { number: 2, name: "Mar Gabriel" },
+      { number: 3, name: "St. Joseph" },
+      { number: 4, name: "St. Andrews" },
+      { number: 5, name: "Mar Gregorious" },
+      { number: 6, name: "St. Thomas" }
+    ],
+    3: [
+      { number: 1, name: "St. Paul" },
+      { number: 2, name: "Mar Aprem" },
+      { number: 3, name: "St. James" }
+    ],
+    4: [
+      { number: 1, name: "St. Johns" },
+      { number: 2, name: "Mar Micheal" },
+      { number: 3, name: "Mar Bahanam" }
+    ],
+    5: [
+      { number: 1, name: "St. George" },
+      { number: 2, name: "Morth Uluthy" },
+      { number: 3, name: "Mar Kauma" },
+      { number: 4, name: "Mar Alias" },
+      { number: 5, name: "Mar Ignatious" },
+      { number: 6, name: "St. Peters" }
+    ],
+    6: [
+      { number: 1, name: "Mar Severios" },
+      { number: 2, name: "Mar Yacob Burdhana" },
+      { number: 3, name: "Mar Semavoon" },
+      { number: 4, name: "Mar Ahathulla" },
+      { number: 5, name: "St. Mathews" },
+      { number: 6, name: "Mar Julius" }
+    ]
+  };
+
   const [formData, setFormData] = useState({
-    sl_no: "",
     name: "",
     house_name: "",
     address_place: "",
+    block: "",
+    unit: "",
     father_husband_name: "",
     mother_wife_name: "",
     death_date: "",
@@ -111,6 +154,11 @@ const AddDeathRecord = () => {
       name: "",
       house_name: "",
       address_place: "",
+<<<<<<< HEAD
+=======
+      block: "",
+      unit: "",
+>>>>>>> dabf6a2 (changes made to death and marriage)
     }));
   };
 
@@ -132,6 +180,7 @@ const AddDeathRecord = () => {
       alert("⚠️ Name is required for non-parishioner.");
       return;
     }
+<<<<<<< HEAD
 
     if (!formData.death_date) {
       alert("⚠️ Death date is required.");
@@ -142,11 +191,14 @@ const AddDeathRecord = () => {
       alert("⚠️ Please enter a valid Serial Number.");
       return;
     }
+=======
+>>>>>>> dabf6a2 (changes made to death and marriage)
 
 
     const payload = {
       memberId: isParishioner ? selectedMember : null,
       nextHofId: isParishioner && isHof ? nextHof : null,
+<<<<<<< HEAD
 
       sl_no: parseInt(formData.sl_no),
       family_no: isParishioner ? selectedFamily.family_number : null,
@@ -166,6 +218,27 @@ const AddDeathRecord = () => {
       cell_no: formData.cell_no,
       remarks: formData.remarks,
 
+=======
+      family_no: isParishioner ? selectedFamily.family_number : null,
+
+      name: formData.name,
+      house_name: formData.house_name,
+      address_place: formData.address_place,
+      block: formData.block,
+      unit: formData.unit,
+      father_husband_name: formData.father_husband_name,
+      mother_wife_name: formData.mother_wife_name,
+
+      death_date: formData.death_date,
+      burial_date: formData.burial_date,
+      age: formData.age ? parseInt(formData.age) : null,
+
+      conducted_by: formData.conducted_by,
+      cause_of_death: formData.cause_of_death,
+      cell_no: formData.cell_no,
+      remarks: formData.remarks,
+
+>>>>>>> dabf6a2 (changes made to death and marriage)
       isParishioner: Boolean(isParishioner),
     };
 
@@ -194,10 +267,11 @@ const AddDeathRecord = () => {
       setIsHof(false);
       setNextHof("");
       setFormData({
-        sl_no: "",
         name: "",
         house_name: "",
         address_place: "",
+        block: "",
+        unit: "",
         father_husband_name: "",
         mother_wife_name: "",
         death_date: "",
@@ -238,7 +312,43 @@ const AddDeathRecord = () => {
           </label>
         </div>
 
+<<<<<<< HEAD
 
+=======
+        <div className="input-group">
+          <label>Block</label>
+          <select
+            name="block"
+            value={formData.block}
+            onChange={(e) => setFormData({ ...formData, block: e.target.value, unit: "" })}
+          >
+            <option value="">Select Block</option>
+            {Object.keys(blockUnits).map((blockKey) => (
+              <option key={blockKey} value={blockKey}>
+                Block {blockKey}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {formData.block && (
+          <div className="input-group">
+            <label>Unit</label>
+            <select
+              name="unit"
+              value={formData.unit}
+              onChange={handleChange}
+            >
+              <option value="">Select Unit</option>
+              {blockUnits[formData.block].map((unitObj) => (
+                <option key={unitObj.number} value={`${unitObj.number} - ${unitObj.name}`}>
+                  Unit {unitObj.number} - {unitObj.name}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
+>>>>>>> dabf6a2 (changes made to death and marriage)
 
         {/* ================= PARISHIONER FLOW ================= */}
         {isParishioner && (
@@ -358,6 +468,7 @@ const AddDeathRecord = () => {
           </>
         )}
 
+<<<<<<< HEAD
 
 
 
@@ -373,6 +484,8 @@ const AddDeathRecord = () => {
           />
           <label>Sl No</label>
         </div>
+=======
+>>>>>>> dabf6a2 (changes made to death and marriage)
 
         <div className="input-group">
           <input

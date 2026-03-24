@@ -134,435 +134,310 @@ export function generateTablePdf({ title, columns, rows, fileName }) {
   doc.save(fileName || "report.pdf");
 }
 
-// --- Single-record certificates (portrait A4) ---
+// --- Single-record certificates (portrait A4) with table layout ---
 
 function createCertificateDoc(title) {
   const doc = new jsPDF("p", "mm", "a4");
   const pageWidth = doc.internal.pageSize.getWidth();
+  const pageHeight = doc.internal.pageSize.getHeight();
+  const margin = 15;
 
+  // Church name
   doc.setFont("helvetica", "bold");
-  doc.setFontSize(16);
+  doc.setFontSize(14);
   doc.text(
     "ST MARY'S JACOBITE SYRIAN CATHEDRAL, PALLIKARA",
     pageWidth / 2,
-    20,
+    22,
     { align: "center" }
   );
 
-  doc.setFontSize(18);
+  // Decorative line under church name
+  doc.setDrawColor(139, 90, 43);
+  doc.setLineWidth(0.6);
+  doc.line(margin + 15, 26, pageWidth - margin - 15, 26);
+
+  // Certificate title
+  doc.setFontSize(16);
   doc.text(title, pageWidth / 2, 35, { align: "center" });
 
-  return { doc, pageWidth };
+  // Thin line under title
+  doc.setLineWidth(0.3);
+  doc.line(margin + 30, 38, pageWidth - margin - 30, 38);
+
+  return { doc, pageWidth, pageHeight, margin };
 }
 
-function drawFieldRow(doc, options) {
-  const {
-    label,
-    value,
-    y,
-    labelX,
-    valueX,
-    labelWidth,
-    valueWidth,
-    lineHeight = 6,
-  } = options;
-
-  const labelText = `${label}`;
-  const valueText = value == null ? "" : Array.isArray(value) ? value.join(" ") : String(value);
+/**
+ * Draws a bordered table row with label + value cells
+ * Returns the height of the row drawn.
+ */
+function drawTableRow(doc, { y, labelX, labelWidth, valueWidth, label, value, lineHeight = 6, padding = 3 }) {
+  const safeValue = value == null ? "" : Array.isArray(value) ? value.join(" ") : String(value);
 
   doc.setFont("helvetica", "bold");
-  const labelLines = doc.splitTextToSize(labelText, labelWidth);
+  doc.setFontSize(11);
+  const labelLines = doc.splitTextToSize(label, labelWidth - 2 * padding);
+
   doc.setFont("helvetica", "normal");
-  const valueLines = doc.splitTextToSize(valueText, valueWidth);
+  doc.setFontSize(11);
+  const valueLines = doc.splitTextToSize(safeValue, valueWidth - 2 * padding);
 
-  const lineCount = Math.max(labelLines.length, valueLines.length, 1);
-  const rowHeight = lineCount * lineHeight;
+  const maxLines = Math.max(labelLines.length, valueLines.length, 1);
+  const rowHeight = maxLines * lineHeight + 2 * padding;
 
-  // Draw label lines
+  // Draw cell borders
+  doc.setDrawColor(160, 130, 100);
+  doc.setLineWidth(0.25);
+  // Label cell
+  doc.rect(labelX, y, labelWidth, rowHeight);
+  // Value cell
+  doc.rect(labelX + labelWidth, y, valueWidth, rowHeight);
+
+  // Fill label cell background (light cream)
+  doc.setFillColor(248, 243, 235);
+  doc.rect(labelX, y, labelWidth, rowHeight, "F");
+  // Redraw border over fill
+  doc.setDrawColor(160, 130, 100);
+  doc.rect(labelX, y, labelWidth, rowHeight);
+  doc.rect(labelX + labelWidth, y, valueWidth, rowHeight);
+
+  // Write text
   doc.setFont("helvetica", "bold");
-  labelLines.forEach((line, index) => {
-    doc.text(line, labelX, y + index * lineHeight);
+  doc.setFontSize(11);
+  labelLines.forEach((line, i) => {
+    doc.text(line, labelX + padding, y + padding + 3 + i * lineHeight);
   });
 
-  // Draw value lines
   doc.setFont("helvetica", "normal");
-  valueLines.forEach((line, index) => {
-    doc.text(line, valueX, y + index * lineHeight);
+  doc.setFontSize(11);
+  valueLines.forEach((line, i) => {
+    doc.text(line, labelX + labelWidth + padding, y + padding + 3 + i * lineHeight);
   });
 
   return rowHeight;
 }
 
-export function generateDeathCertificatePdf(record) {
-  const { doc, pageWidth } = createCertificateDoc("Death Certificate");
+/**
+ * Draws a section header row spanning the full table width
+ */
+function drawSectionHeader(doc, { y, labelX, totalWidth, text, lineHeight = 6, padding = 3 }) {
+  const rowHeight = lineHeight + 2 * padding;
 
-  let y = 55;
-  const labelX = 25;
-  const valueX = 80;
-  const labelWidth = 50;
-  const valueWidth = pageWidth - valueX - 20;
-  const lineHeight = 6;
+  // Background fill (slightly darker cream)
+  doc.setFillColor(235, 222, 205);
+  doc.rect(labelX, y, totalWidth, rowHeight, "F");
 
-  const regNo = record.sl_no || record.reg_no || record._id || "";
+  // Border
+  doc.setDrawColor(160, 130, 100);
+  doc.setLineWidth(0.25);
+  doc.rect(labelX, y, totalWidth, rowHeight);
 
-  y += drawFieldRow(doc, {
-    label: "Reg. No.:",
-    value: regNo,
-    y,
-    labelX,
-    valueX,
-    labelWidth,
-    valueWidth,
-    lineHeight,
-  }) + 2;
+  // Text
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(12);
+  doc.text(text, labelX + totalWidth / 2, y + padding + 4, { align: "center" });
 
-  y += drawFieldRow(doc, {
-    label: "Name:",
-    value: record.name,
-    y,
-    labelX,
-    valueX,
-    labelWidth,
-    valueWidth,
-    lineHeight,
-  }) + 2;
+  return rowHeight;
+}
 
-  y += drawFieldRow(doc, {
-    label: "Age:",
-    value: record.age ? `${record.age} years` : "",
-    y,
-    labelX,
-    valueX,
-    labelWidth,
-    valueWidth,
-    lineHeight,
-  }) + 2;
+function drawCertFooter(doc, pageWidth, y, margin) {
+  y += 15; // extra gap after table
+  const certText = "Certified that the above information is a true extract taken from the registers maintained at the Church.";
+  doc.setFont("helvetica", "italic");
+  doc.setFontSize(10);
+  const lines = doc.splitTextToSize(certText, pageWidth - 2 * margin - 10);
+  doc.text(lines, margin + 5, y);
+  y += lines.length * 6 + 14;
 
-  y += drawFieldRow(doc, {
-    label: "House Name:",
-    value: record.house_name,
-    y,
-    labelX,
-    valueX,
-    labelWidth,
-    valueWidth,
-    lineHeight,
-  }) + 2;
-
-  y += drawFieldRow(doc, {
-    label: "Address:",
-    value: record.address_place,
-    y,
-    labelX,
-    valueX,
-    labelWidth,
-    valueWidth,
-    lineHeight,
-  }) + 4;
-
-  const formatDate = (d) =>
-    d ? new Date(d).toLocaleDateString("en-GB") : "";
-
-  y += drawFieldRow(doc, {
-    label: "Husband's / Father's Name:",
-    value: record.father_husband_name,
-    y,
-    labelX,
-    valueX,
-    labelWidth,
-    valueWidth,
-    lineHeight,
-  }) + 2;
-
-  y += drawFieldRow(doc, {
-    label: "Date of Demise:",
-    value: formatDate(record.death_date),
-    y,
-    labelX,
-    valueX,
-    labelWidth,
-    valueWidth,
-    lineHeight,
-  }) + 2;
-
-  y += drawFieldRow(doc, {
-    label: "Cause of Death:",
-    value: record.cause_of_death,
-    y,
-    labelX,
-    valueX,
-    labelWidth,
-    valueWidth,
-    lineHeight,
-  }) + 2;
-
-  y += drawFieldRow(doc, {
-    label: "Date of Funeral:",
-    value: formatDate(record.burial_date),
-    y,
-    labelX,
-    valueX,
-    labelWidth,
-    valueWidth,
-    lineHeight,
-  }) + 2;
-
-  y += drawFieldRow(doc, {
-    label: "Funeral Conducted by:",
-    value: record.conducted_by,
-    y,
-    labelX,
-    valueX,
-    labelWidth,
-    valueWidth,
-    lineHeight,
-  }) + 10;
-
-  const certText =
-    "Certified that the above information is the true extract taken from the records maintained at the Church.";
   doc.setFont("helvetica", "normal");
-  const lines = doc.splitTextToSize(certText, pageWidth - 40);
-  doc.text(lines, 20, y);
-  y += lines.length * 6 + 10;
-
+  doc.setFontSize(10);
   const today = new Date().toLocaleDateString("en-GB");
-  doc.text(`Date: ${today}`, 20, y);
+  doc.text(`Date: ${today}`, margin + 5, y);
 
-  doc.text("Vicar", pageWidth - 40, y + 20);
+  // Signature line
+  doc.setDrawColor(100, 80, 60);
+  doc.setLineWidth(0.4);
+  doc.line(pageWidth - margin - 60, y + 12, pageWidth - margin - 5, y + 12);
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(10);
+  doc.text("Vicar", pageWidth - margin - 33, y + 18, { align: "center" });
+}
+
+// ============================================================
+// DEATH CERTIFICATE
+// ============================================================
+export function generateDeathCertificatePdf(record) {
+  const { doc, pageWidth, pageHeight, margin } = createCertificateDoc("Death Certificate");
+
+  const labelX = margin + 3;
+  const labelWidth = 65;
+  const valueWidth = pageWidth - 2 * margin - 6 - labelWidth;
+
+  const formatDate = (d) => d ? new Date(d).toLocaleDateString("en-GB") : "";
+  const regNo = record.reg_no || "";
+
+  let y = 44;
+
+  const fields = [
+    ["Reg. No.", regNo],
+    ["Name", record.name],
+    ["Age", record.age ? `${record.age} years` : ""],
+    ["House Name", record.house_name],
+    ["Address", record.address_place],
+    ["Husband's / Father's Name", record.father_husband_name],
+    ["Date of Demise", formatDate(record.death_date)],
+    ["Cause of Death", record.cause_of_death],
+    ["Date of Funeral", formatDate(record.burial_date)],
+    ["Funeral Conducted by", record.conducted_by],
+  ];
+
+  fields.forEach(([label, value]) => {
+    if (y > pageHeight - 40) { doc.addPage(); y = 20; }
+    y += drawTableRow(doc, { y, labelX, labelWidth, valueWidth, label, value });
+  });
+
+  if (y > pageHeight - 50) { doc.addPage(); y = 20; }
+  y += 10;
+  drawCertFooter(doc, pageWidth, y, margin);
 
   doc.save(`death_certificate_${regNo || record.name || "record"}.pdf`);
 }
 
+// ============================================================
+// BAPTISM CERTIFICATE
+// ============================================================
 export function generateBaptismCertificatePdf(record) {
-  const { doc, pageWidth } = createCertificateDoc("Baptism Certificate");
+  const { doc, pageWidth, pageHeight, margin } = createCertificateDoc("Baptism Certificate");
 
-  let y = 55;
-  const labelX = 25;
-  const valueX = 80;
-  const labelWidth = 55;
-  const valueWidth = pageWidth - valueX - 20;
-  const lineHeight = 6;
+  const labelX = margin + 3;
+  const labelWidth = 72;
+  const valueWidth = pageWidth - 2 * margin - 6 - labelWidth;
 
-  const regNo = record.certificate_number || record.sl_no || record._id || "";
-  const formatDate = (d) =>
-    d ? new Date(d).toLocaleDateString("en-GB") : "";
+  const formatDate = (d) => d ? new Date(d).toLocaleDateString("en-GB") : "";
+  const regNo = record.reg_no || "";
 
-  y += drawFieldRow(doc, {
-    label: "Reg. / Cert. No.:",
-    value: regNo,
-    y,
-    labelX,
-    valueX,
-    labelWidth,
-    valueWidth,
-    lineHeight,
-  }) + 2;
+  let y = 44;
 
-  y += drawFieldRow(doc, {
-    label: "Name:",
-    value: record.member_name,
-    y,
-    labelX,
-    valueX,
-    labelWidth,
-    valueWidth,
-    lineHeight,
-  }) + 2;
+  const fields = [
+    ["Reg. No.", regNo],
+    ["Baptism Name of Child", record.bapt_name],
+    ["Name of Child (Official)", record.member_name],
+    ["Address", record.address],
+    ["Gender", record.gender],
+    ["Father's Name", record.father_name],
+    ["Mother's Name", record.mother_name],
+    ["Date of Birth", formatDate(record.member_dob)],
+    ["Date of Baptism", formatDate(record.date_of_baptism)],
+    ["Godfather / Godmother", record.godparent_name],
+    ["Address of Godparent", record.godparent_house_name],
+    ["Church where Baptized", record.church_where_baptised],
+    ["Baptised By", record.baptised_by],
+  ];
 
-  y += drawFieldRow(doc, {
-    label: "Baptism Name:",
-    value: record.bapt_name,
-    y,
-    labelX,
-    valueX,
-    labelWidth,
-    valueWidth,
-    lineHeight,
-  }) + 2;
+  fields.forEach(([label, value]) => {
+    if (y > pageHeight - 40) { doc.addPage(); y = 20; }
+    y += drawTableRow(doc, { y, labelX, labelWidth, valueWidth, label, value });
+  });
 
-  y += drawFieldRow(doc, {
-    label: "Gender:",
-    value: record.gender,
-    y,
-    labelX,
-    valueX,
-    labelWidth,
-    valueWidth,
-    lineHeight,
-  }) + 2;
-
-  y += drawFieldRow(doc, {
-    label: "Date of Birth:",
-    value: formatDate(record.member_dob),
-    y,
-    labelX,
-    valueX,
-    labelWidth,
-    valueWidth,
-    lineHeight,
-  }) + 2;
-
-  y += drawFieldRow(doc, {
-    label: "Family Name:",
-    value: record.family_name,
-    y,
-    labelX,
-    valueX,
-    labelWidth,
-    valueWidth,
-    lineHeight,
-  }) + 2;
-
-  y += drawFieldRow(doc, {
-    label: "Head of Family:",
-    value: record.hof,
-    y,
-    labelX,
-    valueX,
-    labelWidth,
-    valueWidth,
-    lineHeight,
-  }) + 2;
-
-  y += drawFieldRow(doc, {
-    label: "Place of Baptism:",
-    value: record.place_of_baptism,
-    y,
-    labelX,
-    valueX,
-    labelWidth,
-    valueWidth,
-    lineHeight,
-  }) + 2;
-
-  y += drawFieldRow(doc, {
-    label: "Church Where Baptised:",
-    value: record.church_where_baptised,
-    y,
-    labelX,
-    valueX,
-    labelWidth,
-    valueWidth,
-    lineHeight,
-  }) + 2;
-
-  y += drawFieldRow(doc, {
-    label: "Godparent Name:",
-    value: record.godparent_name,
-    y,
-    labelX,
-    valueX,
-    labelWidth,
-    valueWidth,
-    lineHeight,
-  }) + 2;
-
-  y += drawFieldRow(doc, {
-    label: "Godparent House:",
-    value: record.godparent_house_name,
-    y,
-    labelX,
-    valueX,
-    labelWidth,
-    valueWidth,
-    lineHeight,
-  }) + 10;
-
-  const certText =
-    "Certified that the above information is the true extract taken from the baptism register maintained at the Church.";
-  doc.setFont("helvetica", "normal");
-  const lines = doc.splitTextToSize(certText, pageWidth - 40);
-  doc.text(lines, 20, y);
-  y += lines.length * 6 + 10;
-
-  const today = new Date().toLocaleDateString("en-GB");
-  doc.text(`Date: ${today}`, 20, y);
-
-  doc.text("Vicar", pageWidth - 40, y + 20);
+  if (y > pageHeight - 50) { doc.addPage(); y = 20; }
+  y += 10;
+  drawCertFooter(doc, pageWidth, y, margin);
 
   doc.save(`baptism_certificate_${regNo || record.member_name || "record"}.pdf`);
 }
 
+// ============================================================
+// MARRIAGE CERTIFICATE
+// ============================================================
 export function generateMarriageCertificatePdf(record) {
-  const { doc, pageWidth } = createCertificateDoc("Marriage Certificate");
+  const { doc, pageWidth, pageHeight, margin } = createCertificateDoc("Marriage Certificate");
 
-  let y = 55;
-  const labelX = 25;
-  const valueX = 80;
-  const labelWidth = 55;
-  const valueWidth = pageWidth - valueX - 20;
-  const lineHeight = 6;
+  const labelX = margin + 3;
+  const labelWidth = 60;
+  const totalWidth = pageWidth - 2 * margin - 6;
+  const valueWidth = totalWidth - labelWidth;
 
-  const regNo = record.marriage_id || record._id || "";
-  const formatDate = (d) =>
-    d ? new Date(d).toLocaleDateString("en-GB") : "";
+  const formatDate = (d) => d ? new Date(d).toLocaleDateString("en-GB") : "";
+  const regNo = record.reg_no || "";
 
-  y += drawFieldRow(doc, {
-    label: "Reg. No.:",
-    value: regNo,
-    y,
-    labelX,
-    valueX,
-    labelWidth,
-    valueWidth,
-    lineHeight,
-  }) + 2;
+  let y = 44;
 
-  y += drawFieldRow(doc, {
-    label: "Groom:",
-    value: record.spouse1,
-    y,
-    labelX,
-    valueX,
-    labelWidth,
-    valueWidth,
-    lineHeight,
-  }) + 2;
+  const checkPage = () => { if (y > pageHeight - 40) { doc.addPage(); y = 20; } };
 
-  y += drawFieldRow(doc, {
-    label: "Bride:",
-    value: record.spouse2,
-    y,
-    labelX,
-    valueX,
-    labelWidth,
-    valueWidth,
-    lineHeight,
-  }) + 2;
+  // Reg No
+  y += drawTableRow(doc, { y, labelX, labelWidth, valueWidth, label: "Reg. No.", value: regNo });
 
-  y += drawFieldRow(doc, {
-    label: "Date of Marriage:",
-    value: formatDate(record.date),
-    y,
-    labelX,
-    valueX,
-    labelWidth,
-    valueWidth,
-    lineHeight,
-  }) + 2;
+  // ---- Groom Section ----
+  checkPage();
+  y += drawSectionHeader(doc, { y, labelX, totalWidth, text: "GROOM" });
 
-  y += drawFieldRow(doc, {
-    label: "Place of Marriage:",
-    value: record.place,
-    y,
-    labelX,
-    valueX,
-    labelWidth,
-    valueWidth,
-    lineHeight,
-  }) + 10;
+  const groomFields = [
+    ["Name", record.spouse1_name],
+    ["Address", record.spouse1_address],
+    ["City & District", record.spouse1_city_district],
+    ["State & Country", record.spouse1_state_country],
+    ["Father's Name", record.spouse1_father_name],
+    ["Mother's Name", record.spouse1_mother_name],
+    ["Name of Parish", record.spouse1_home_parish],
+  ];
+  groomFields.forEach(([label, value]) => {
+    checkPage();
+    y += drawTableRow(doc, { y, labelX, labelWidth, valueWidth, label, value });
+  });
 
-  const certText =
-    "Certified that the above marriage was solemnised according to the rites of the Church and is a true extract taken from the marriage register maintained at the Church.";
+  // ---- Bride Section ----
+  checkPage();
+  y += drawSectionHeader(doc, { y, labelX, totalWidth, text: "BRIDE" });
+
+  const brideFields = [
+    ["Name", record.spouse2_name],
+    ["Address", record.spouse2_address],
+    ["City & District", record.spouse2_city_district],
+    ["State & Country", record.spouse2_state_country],
+    ["Father's Name", record.spouse2_father_name],
+    ["Mother's Name", record.spouse2_mother_name],
+    ["Name of Parish", record.spouse2_home_parish],
+  ];
+  brideFields.forEach(([label, value]) => {
+    checkPage();
+    y += drawTableRow(doc, { y, labelX, labelWidth, valueWidth, label, value });
+  });
+
+  // ---- Marriage Details ----
+  checkPage();
+  y += drawSectionHeader(doc, { y, labelX, totalWidth, text: "MARRIAGE DETAILS" });
+
+  checkPage();
+  y += drawTableRow(doc, { y, labelX, labelWidth, valueWidth, label: "Date of Marriage", value: formatDate(record.date) });
+  checkPage();
+  y += drawTableRow(doc, { y, labelX, labelWidth, valueWidth, label: "Place of Marriage", value: record.place });
+  checkPage();
+  y += drawTableRow(doc, { y, labelX, labelWidth, valueWidth, label: "Solemnized By", value: record.solemnized_by });
+
+  if (y > pageHeight - 50) { doc.addPage(); y = 20; }
+
+  y += 15; // extra gap after table
+  const certText = "Certified that the above marriage was solemnised according to the rites of the Church and is a true extract from the marriage register.";
+  doc.setFont("helvetica", "italic");
+  doc.setFontSize(10);
+  const lines = doc.splitTextToSize(certText, pageWidth - 2 * margin - 10);
+  doc.text(lines, margin + 5, y);
+  y += lines.length * 6 + 14;
+
   doc.setFont("helvetica", "normal");
-  const lines = doc.splitTextToSize(certText, pageWidth - 40);
-  doc.text(lines, 20, y);
-  y += lines.length * 6 + 10;
-
+  doc.setFontSize(10);
   const today = new Date().toLocaleDateString("en-GB");
-  doc.text(`Date: ${today}`, 20, y);
+  doc.text(`Date: ${today}`, margin + 5, y);
 
-  doc.text("Vicar", pageWidth - 40, y + 20);
+  doc.setDrawColor(100, 80, 60);
+  doc.setLineWidth(0.4);
+  doc.line(pageWidth - margin - 60, y + 12, pageWidth - margin - 5, y + 12);
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(10);
+  doc.text("Vicar", pageWidth - margin - 33, y + 18, { align: "center" });
 
   doc.save(`marriage_certificate_${regNo || "record"}.pdf`);
 }
+
+

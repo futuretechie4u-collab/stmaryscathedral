@@ -1,6 +1,5 @@
 /* ══════════════════════════════════════════════
-   DEATH ADD — Duplicates addfamily.css
-   (Both share .container, .input-group, etc.)
+   ADD FAMILY / DEATH ADD — Shared Form Styles
    ══════════════════════════════════════════════ */
 
 /* Container */
@@ -23,6 +22,7 @@
   color: var(--brown-800);
   font-size: 1.4rem;
   font-weight: 700;
+  letter-spacing: -0.01em;
 }
 
 /* Input Group Wrapper */
@@ -81,7 +81,7 @@
   border-radius: var(--radius-full);
 }
 
-/* Input Fields */
+/* ── Input Fields ── */
 .input-group input,
 .input-group select,
 .input-group textarea,
@@ -114,7 +114,7 @@
   background-color: white;
 }
 
-/* Floating Labels */
+/* ── Floating Labels ── */
 .input-group label {
   position: absolute;
   top: -9px;
@@ -130,7 +130,7 @@
   text-transform: uppercase;
 }
 
-/* Fetch Button */
+/* ── Fetch Button ── */
 .fetch-btn {
   display: inline-block;
   margin-top: 8px;
@@ -150,7 +150,7 @@
   transform: translateY(-1px);
 }
 
-/* Toggle Row */
+/* ── Toggle Row ── */
 .toggle-row {
   display: flex;
   align-items: center;
@@ -177,7 +177,7 @@
   color: var(--brown-700);
 }
 
-/* Switch */
+/* ── Switch ── */
 .switch {
   position: relative;
   width: 44px;
@@ -221,7 +221,7 @@
   transform: translateX(22px);
 }
 
-/* Submit Button */
+/* ── Submit Button ── */
 .submit-btn {
   width: 100%;
   padding: 14px;
@@ -234,6 +234,7 @@
   font-weight: 700;
   cursor: pointer;
   transition: all 0.25s var(--ease);
+  letter-spacing: 0.02em;
 }
 
 .submit-btn:hover {
@@ -260,7 +261,7 @@
   box-shadow: var(--shadow-sm);
 }
 
-/* Search Loading */
+/* ── Search-related ── */
 .search-loading {
   position: absolute;
   top: 100%;
@@ -305,6 +306,7 @@
   font-size: 0.9rem;
 }
 
+/* ── Responsive ── */
 @media (max-width: 640px) {
   .container {
     margin: 16px;

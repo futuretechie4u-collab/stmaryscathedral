@@ -2,8 +2,7 @@
   "name": "stmaryscathedral",
   "private": true,
   "scripts": {
-    "install-all": "npm install --prefix tnp-proj && npm install --prefix backend",
-    "build": "npm run build --prefix tnp-proj",
+    "build": "npm install --prefix tnp-proj && npm run build --prefix tnp-proj",
     "start": "npm run start --prefix backend"
   },
   "dependencies": {

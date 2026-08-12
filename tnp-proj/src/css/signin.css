@@ -1,18 +1,25 @@
 /* ══════════════════════════════════════════════
    SIGN IN — Premium Auth Form
    ══════════════════════════════════════════════ */
+.add-card{
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  padding: 2rem;
+}
 
 .form {
   background: var(--cream-light);
   box-shadow: var(--shadow-lg);
-  width: 360px;
+  width: 420px;
   display: flex;
   flex-direction: column;
   gap: 16px;
-  padding: 32px 28px;
+  padding: 2rem;
   border-radius: var(--radius-xl);
   border: 1px solid var(--cream-dark);
   animation: fadeIn 0.4s var(--ease);
+  
 }
 
 .form .label {

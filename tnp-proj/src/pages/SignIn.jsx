@@ -67,6 +67,7 @@ const SignIn = () => {
   return (
 <section class="add-card page">
   <form class="form" onSubmit={handleSignIn}>
+    <label><h2>Administrator Panel</h2></label>
     {error && <div style={{color: 'red', marginBottom: '10px'}}>{error}</div>}
     <label for="name" class="label">
       <span class="title">USER NAME</span>
@@ -88,7 +89,7 @@ const SignIn = () => {
         type="password"
         name="input-name"
         title="Input title"
-        placeholder="password"
+        placeholder="Password"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
       />

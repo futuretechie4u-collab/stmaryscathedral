@@ -36,10 +36,31 @@ api.interceptors.response.use(
 export default API_BASE;
 export { api };
 
-export const getMembers = () => api.get("/members");
+/**
+ * Fetches all records from a paginated endpoint by looping through pages.
+ * Backend caps each page at 200; this keeps going until a short page is received.
+ */
+const fetchAllPages = async (endpoint, extraParams = {}) => {
+  const PAGE_LIMIT = 200;
+  let page = 1;
+  let allData = [];
+
+  while (true) {
+    const res = await api.get(endpoint, { params: { page, limit: PAGE_LIMIT, ...extraParams } });
+    const data = res.data || [];
+    allData = allData.concat(data);
+    if (data.length < PAGE_LIMIT) break; // last page reached
+    page += 1;
+  }
+
+  // Return in the same shape as a normal axios response so callers stay unchanged
+  return { data: allData };
+};
+
+export const getMembers = (params = {}) => fetchAllPages("/members", params);
 export const createMember = (memberData) => api.post("/members", memberData);
 export const updateMember = (id, data) => api.put(`/members/${id}`, data);
 export const deleteMember = (id) => api.delete(`/members/${id}`);
 
-export const getFamilies = () => api.get("/families");
+export const getFamilies = (params = {}) => fetchAllPages("/families", params);
 export const createFamily = (data) => api.post("/families", data);

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "../../css/editmember.css";
-import { api } from "../../api";
+import { api, getFamilies } from "../../api";
 
 const EditMember = () => {
   const [families, setFamilies] = useState([]);
@@ -28,7 +28,7 @@ const EditMember = () => {
 
   // ✅ Fetch all families on load
   useEffect(() => {
-    api.get("/families")
+    getFamilies()
       .then(({ data }) => setFamilies(data))
       .catch((err) => console.error("❌ Error fetching families:", err));
   }, []);

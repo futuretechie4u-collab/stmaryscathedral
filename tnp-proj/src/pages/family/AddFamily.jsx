@@ -148,6 +148,8 @@ const AddFamily = () => {
       >
 
 
+        <h2>Add Family</h2>
+
         {/* BLOCK */}
         <div className="input-group">
 

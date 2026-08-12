@@ -43,7 +43,7 @@ router.get("/", async (req, res) => {
     const limit = Math.min(200, Math.max(1, parseInt(req.query.limit, 10) || 50));
     const skip = (page - 1) * limit;
 
-    let query = {};
+    let query = { deceased: { $ne: true } };
     if (family_number) {
       query.family_number = family_number;
     }

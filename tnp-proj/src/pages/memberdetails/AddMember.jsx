@@ -1,23 +1,24 @@
 import React from 'react'
-
 import { useNavigate } from "react-router-dom"
+import "../../css/memberdetails.css"
 
-const AddMember = () => {    
-       const navigate=useNavigate(); 
+const AddMember = () => {
+  const navigate = useNavigate();
   return (
-    <div class="card-container1">
-  <div class="card" onClick={()=> navigate("/ExistingFamilymem")}>
-    <div class="card-details">
-      <p class="text-title">EXISTING FAMILY</p>
+    <div className="card-container1">
+      <div className="card" onClick={() => navigate("/ExistingFamilymem")}>
+        <div className="card-details">
+          <span className="card-icon">🏠</span>
+          <p className="text-title">Existing Family</p>
+        </div>
+      </div>
+      <div className="card" onClick={() => navigate("/AddFamily")}>
+        <div className="card-details">
+          <span className="card-icon">✨</span>
+          <p className="text-title">New Family</p>
+        </div>
+      </div>
     </div>
-  </div>
-  <div class="card" onClick={()=>navigate("/AddFamily")} >
-    <div class="card-details">
-      <p class="text-title">NEW FAMILY</p>
-    </div>
-  </div>
- 
-  </div>
   )
 }
 

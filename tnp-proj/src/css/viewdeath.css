@@ -230,7 +230,7 @@
 
 .modal-header {
   display: flex;
-  justify-content: space-between;
+  justify-content: space-around;
   align-items: center;
   background: var(--brown-700);
   color: white;
@@ -241,6 +241,7 @@
   margin: 0;
   font-size: 1.15em;
   font-weight: 700;
+  width:110%;
 }
 
 .modal-close {

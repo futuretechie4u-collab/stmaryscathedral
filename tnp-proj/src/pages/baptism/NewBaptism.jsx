@@ -258,7 +258,7 @@ const NewBaptism = () => {
   return (
     <div className="container">
       <form className="register-form" onSubmit={handleSubmit}>
-        <h2>Add New Baptism Record</h2>
+        <h2>Baptism Record</h2>
 
         {/* Success banner with download */}
         {savedRecord && (

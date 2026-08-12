@@ -9,12 +9,14 @@ const DeathRecords = () => {
     <div className="card-containermember">
       <div className="card" onClick={() => navigate("/AddDeathRecord")}>
         <div className="card-details">
-          <p className="text-title">ADD A DEATH RECORD</p>
+          <span className="card-icon">➕</span>
+          <p className="text-title">Death Record</p>
         </div>
       </div>
       <div className="card" onClick={() => navigate("/ViewDeathRecords")}>
         <div className="card-details">
-          <p className="text-title">VIEW DEATH RECORDS</p>
+          <span className="card-icon">📜</span>
+          <p className="text-title">View Records</p>
         </div>
       </div>
     </div>

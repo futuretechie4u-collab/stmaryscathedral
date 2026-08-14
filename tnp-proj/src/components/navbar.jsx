@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import '../css/navbar.css';
 import pic1 from '../assets/images/logo.jpg';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { jwtDecode } from "jwt-decode";
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -11,30 +10,25 @@ const Navbar = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
-    const isTokenValid = (token) => {
-      if (!token) return false;
-      try {
-        const decoded = jwtDecode(token);
-        if (!decoded?.exp) return false;
-        const now = Math.floor(Date.now() / 1000);
-        return decoded.exp > now;
-      } catch {
-        return false;
-      }
-    };
-
     const checkAuth = () => {
-      const token = localStorage.getItem('token');
       const user = localStorage.getItem('username');
-      setIsAuthenticated(isTokenValid(token));
+      setIsAuthenticated(!!user);
       setUsername(user || 'User');
     };
 
     checkAuth();
   }, [location]);
 
-  const handleSignOut = () => {
-    localStorage.removeItem('token');
+  const handleSignOut = async () => {
+    try {
+      await fetch(`${import.meta.env.VITE_API_URL || ""}/api/auth/logout`, {
+        method: 'POST',
+        credentials: "include"
+      });
+    } catch (error) {
+      console.error("Logout error", error);
+    }
+    
     localStorage.removeItem('username');
     navigate('/SignIn');
   };
@@ -53,10 +47,13 @@ const Navbar = () => {
         <span onClick={() => navigate('/')} className="nav-link">Home</span>
         <span onClick={() => navigate('/About')} className="nav-link">About</span>
         {isAuthenticated ? (
-          <>
-            <span className="nav-link" style={{ cursor: 'default' }}>{username}</span>
-            <span onClick={handleSignOut} className="nav-link">Sign Out</span>
-          </>
+          <div className="nav-user-dropdown">
+            <span className="nav-link" style={{ cursor: 'default' }}>Signed in as {username}</span>
+            <div className="nav-dropdown-content">
+              <span onClick={() => navigate('/ChangePassword')} className="dropdown-item">Change Password</span>
+              <span onClick={handleSignOut} className="dropdown-item">Sign Out</span>
+            </div>
+          </div>
         ) : (
           <span onClick={() => navigate('/SignIn')} className="nav-link">Sign In</span>
         )}

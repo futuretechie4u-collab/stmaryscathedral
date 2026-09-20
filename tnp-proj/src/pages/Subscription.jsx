@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import "../css/subscription.css";
-import { api } from "../api";
+import { api, getFamilies } from "../api";
 
 const Subscription = () => {
   // ─── Family search state ───
@@ -73,7 +73,7 @@ const Subscription = () => {
 
   // Fetch all families on mount
   useEffect(() => {
-    api.get("/families")
+    getFamilies()
       .then(({ data }) => setFamilies(data))
       .catch((err) => console.error("Error fetching families:", err));
   }, []);

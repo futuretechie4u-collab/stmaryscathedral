@@ -1,6 +1,5 @@
 import { useEffect } from 'react'
 import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
-import { jwtDecode } from "jwt-decode";
 import './App.css'
 import Navbar from './components/navbar'
 import About from './About';
@@ -25,6 +24,7 @@ import NewBaptism from "./pages/baptism/NewBaptism";
 import AddDeathRecord from './pages/death/AddDeathRecord'; // 🔺 Add this
 import ViewDeathRecords from './pages/death/ViewDeathRecords'; // 🔺 Add this
 import EditMember from './pages/memberdetails/EditMember';
+import ChangePassword from './pages/ChangePassword';
 
 
 // Back button — shown at the top of page content (not in navbar)
@@ -45,45 +45,38 @@ function BackButton() {
 function App() {
   const navigate = useNavigate()
 
-  const isTokenValid = (token) => {
-    if (!token) return false;
-    try {
-      const decoded = jwtDecode(token);
-      if (!decoded?.exp) return false;
-      const now = Math.floor(Date.now() / 1000);
-      return decoded.exp > now;
-    } catch {
-      return false;
-    }
-  };
-
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (!isTokenValid(token)) {
-      localStorage.removeItem('token');
-      localStorage.removeItem('username');
-      navigate('/SignIn');
-    }
-  }, [navigate])
+    // Check if the user is authenticated on initial load
+    const checkAuth = async () => {
+      try {
+        const res = await fetch(`${import.meta.env.VITE_API_URL || ""}/api/auth/me`, {
+          credentials: "include"
+        });
+        if (!res.ok) {
+          throw new Error('Not authenticated');
+        }
+        const data = await res.json();
+        localStorage.setItem('username', data.user.username);
+      } catch (error) {
+        localStorage.removeItem('username');
+        if (window.location.pathname !== '/SignIn') {
+          navigate('/SignIn');
+        }
+      }
+    };
+    checkAuth();
+  }, [navigate]);
 
   useEffect(() => {
     const originalFetch = window.fetch;
 
     window.fetch = async (input, init = {}) => {
-      const token = localStorage.getItem('token');
-      const headers = new Headers(init.headers || {});
+      // Add credentials to all fetch calls automatically
+      const newInit = { ...init, credentials: "include" };
 
-      if (token) {
-        headers.set('Authorization', `Bearer ${token}`);
-      }
-
-      const response = await originalFetch(input, {
-        ...init,
-        headers
-      });
+      const response = await originalFetch(input, newInit);
 
       if (response.status === 401) {
-        localStorage.removeItem('token');
         localStorage.removeItem('username');
         if (window.location.pathname !== '/SignIn') {
           navigate('/SignIn');
@@ -106,6 +99,7 @@ function App() {
         <BackButton />
         <Routes>
           <Route path="/SignIn" element={<SignIn />} />
+          <Route path="/ChangePassword" element={<ChangePassword />} />
           <Route path="/" element={<Home />} />
           <Route path="/About" element={<About />} />
           <Route path="/FamilyDetails" element={<FamilyDetails />} />

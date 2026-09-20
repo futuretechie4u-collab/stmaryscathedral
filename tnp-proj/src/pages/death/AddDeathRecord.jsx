@@ -333,7 +333,7 @@ const AddDeathRecord = () => {
 
 
 
-        <h2>Add Death Record</h2>
+        <h2>Death Record</h2>
 
         {/* Success banner with download */}
         {savedRecord && (

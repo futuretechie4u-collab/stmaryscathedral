@@ -1,5 +1,5 @@
 import React from "react";
-import "../css/familydetails.css";
+import "../css/memberdetails.css";
 import { useNavigate } from "react-router-dom";
 
 const FamilyDetails = () => {
@@ -9,13 +9,15 @@ const FamilyDetails = () => {
     <div className="card-container1">
       <div className="card" onClick={() => navigate("/NewBaptism")}>
         <div className="card-details">
-          <p className="text-title">NEW BAPTISM</p>
+          <span className="card-icon">💧</span>
+          <p className="text-title">New Baptism</p>
         </div>
       </div>
 
       <div className="card" onClick={() => navigate("/SearchBap")}>
         <div className="card-details">
-          <p className="text-title">BAPTISM RECORDS</p>
+          <span className="card-icon">📜</span>
+          <p className="text-title">View Records</p>
         </div>
       </div>
     </div>

@@ -9,17 +9,20 @@ const MemberDetails = () => {
     <div className="card-containermember">
       <div className="card" onClick={() => navigate("/AddMember")}>
         <div className="card-details">
-          <p className="text-title">ADD MEMBERS</p>
+          <span className="card-icon">➕</span>
+          <p className="text-title">Add Members</p>
         </div>
       </div>
       <div className="card" onClick={() => navigate("/ViewMembers")}>
         <div className="card-details">
-          <p className="text-title">VIEW MEMBERS</p>
+          <span className="card-icon">👥</span>
+          <p className="text-title">View Members</p>
         </div>
       </div>
       <div className="card" onClick={() => navigate("/EditMember")}>
         <div className="card-details">
-          <p className="text-title">EDIT MEMBERS</p>
+          <span className="card-icon">✏️</span>
+          <p className="text-title">Edit Members</p>
         </div>
       </div>
     </div>

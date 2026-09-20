@@ -325,7 +325,7 @@ const ViewDeathRecords = () => {
           <div className="modal-box" onClick={(e) => e.stopPropagation()}>
 
             <div className="modal-header">
-              <h3>✏️ Edit Death Record</h3>
+              <h3 style={{ color: "white" }}>✏️ Edit Death Record</h3>
               <button className="modal-close" onClick={() => setEditModal(false)}>✕</button>
             </div>
 

@@ -1,6 +1,5 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { jwtDecode } from "jwt-decode";
 import "../css/signin.css"
 import API_BASE from "../api";
 
@@ -11,16 +10,18 @@ const SignIn = () => {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
-  const isTokenValid = (token) => {
-    if (!token) return false;
+  const checkAuth = async () => {
     try {
-      const decoded = jwtDecode(token);
-      if (!decoded?.exp) return false;
-      const now = Math.floor(Date.now() / 1000);
-      return decoded.exp > now;
+      const res = await fetch(`${API_BASE}/auth/me`, {
+        credentials: "include"
+      });
+      if (res.ok) {
+        return true;
+      }
     } catch {
       return false;
     }
+    return false;
   };
 
   const handleSignIn = async (e) => {
@@ -39,16 +40,16 @@ const SignIn = () => {
       const res = await fetch(`${API_BASE}/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({ username, password })
       });
 
       const data = await res.json();
 
-      if (!res.ok || !data?.token) {
+      if (!res.ok) {
         throw new Error('Invalid username or password');
       }
 
-      localStorage.setItem('token', data.token);
       localStorage.setItem('username', data.username || username);
       navigate('/');
     } catch {
@@ -58,10 +59,13 @@ const SignIn = () => {
   }
 
   React.useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (isTokenValid(token)) {
-      navigate('/');
-    }
+    const verifyAuth = async () => {
+      const isAuthed = await checkAuth();
+      if (isAuthed) {
+        navigate('/');
+      }
+    };
+    verifyAuth();
   }, [navigate]);
 
   return (

@@ -6,6 +6,7 @@ import helmet from "helmet";
 import rateLimit from "express-rate-limit";
 import path from "path";
 import { fileURLToPath } from "url";
+import cookieParser from "cookie-parser";
 
 import authRoutes from "./routes/authRoutes.js";
 import memberRoutes from "./routes/memberRoutes.js";
@@ -53,10 +54,12 @@ app.use(helmet.contentSecurityPolicy({
 app.use(cors({
   origin: process.env.ALLOWED_ORIGIN || "http://localhost:5173",
   methods: ["GET", "POST", "PUT", "DELETE"],
-  allowedHeaders: ["Content-Type", "Authorization"]
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true
 }));
 
 app.use(express.json());
+app.use(cookieParser());
 
 const loginLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 10 });
 const apiLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 200 });

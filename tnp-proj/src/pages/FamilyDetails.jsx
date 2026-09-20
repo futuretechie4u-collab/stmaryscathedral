@@ -11,13 +11,15 @@ const FamilyDetails = () => {
 
       <div className="card" onClick={() => navigate("/AddFamily")}>
         <div className="card-details">
-          <p className="text-title">ADD FAMILY</p>
+          <span className="card-icon">➕</span>
+          <p className="text-title">Add Family</p>
         </div>
       </div>
 
       <div className="card" onClick={() => navigate("/SearchFamily")}>
         <div className="card-details">
-          <p className="text-title">SEARCH FAMILY</p>
+          <span className="card-icon">🔍</span>
+          <p className="text-title">Search Family</p>
         </div>
       </div>
 
